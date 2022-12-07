@@ -1,17 +1,9 @@
 const { app } = require("./src/lib/slack")
-const { fetchGeneralChannelId } = require("./src/functions/general")
 
-
-// /** Register Listeners */
-// registerListeners(app);
-
-// Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
-  console.log(message)
-  await say(`Hey there <@${message.user}>!`);
-});
-
+// slack functions
+const { fetchGeneralChannelId, postToGeneral } = require("./src/functions/general");
+const { createChannel } = require("./src/functions/ono");
+const { getBotId } = require('./src/functions/bot');
 
 
 (async () => {
@@ -23,7 +15,20 @@ app.message('hello', async ({ message, say }) => {
 })();
 
 
-
+async function initialization() {
+  try {
+    const response = await createChannel()
+    if (response.ok) {
+      const success = await postToGeneral(response.onoChannelId)
+      if (success.ok) {
+        console.log('successfully posted introduction message in general channel')
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+// initialization()
 
 async function channelHistory() {
   try {
@@ -31,28 +36,21 @@ async function channelHistory() {
     const history = await app.client.conversations.history({
       channel: generalChannelId
     })
-    console.log(history)
     return history;
   } catch (error) {
     console.error(error);
   }
 }
 
-async function getBotId() {
-  try {
-    const { user_id } = await app.client.auth.test()
-    return user_id
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 async function getBotPosts() {
   try {
     const { messages } = await channelHistory();
     const botId = await getBotId()
     const botMessage = messages.find(message => message.user === botId);
-    return botMessage;
+    if (botMessage.subtype === 'channel_join') {
+      throw new Error("can't find a message on general channel to delete")
+    } else return botMessage;
   } catch (error) {
     console.error(error)
   }
@@ -61,24 +59,27 @@ async function getBotPosts() {
 async function deletePost(message) {
   try {
     const generalChannelId = await fetchGeneralChannelId()
-    console.log(message.ts)
     // Call the chat.delete method using the WebClient
-    const result = await app.client.chat.delete({
+    const response = await app.client.chat.delete({
       channel: generalChannelId,
       ts: message.ts
     });
-    console.log(result);
+    if (response.ok) {
+      console.log('successfully deleted most recent message in the general channel');
+    }
   }
   catch (error) {
     console.error(error);
   }
 }
 
-async function deleteMessage() {
+async function deleteRecentMessage() {
   try {
     const message = await getBotPosts()
-    deletePost(message)
+    if (message) deletePost(message)
   } catch (error) {
-    console.error(error);
+    console.error(); (error.message);
   }
 }
+
+deleteRecentMessage()

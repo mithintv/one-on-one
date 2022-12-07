@@ -1,4 +1,5 @@
 const { app } = require("../lib/slack")
+const { getBotId } = require("../functions/bot")
 
 async function fetchGeneralChannelId() {
   try {
@@ -10,27 +11,44 @@ async function fetchGeneralChannelId() {
   }
 }
 
-async function joinGeneralChannel() {
+async function checkGeneralMembership(channelId) {
   try {
-    const generalChannelId = await fetchGeneralChannelId()
-    const result = app.client.conversations.join({
-      channel: generalChannelId
+    const { members } = await app.client.conversations.members({
+      channel: channelId
     })
-    return result
+    const botId = await getBotId()
+    return members.find(botId) ? true : false
+  } catch (error) {
+
+  }
+}
+
+async function joinGeneralChannel(channelId) {
+  try {
+    const response = app.client.conversations.join({
+      channel: channelId
+    })
+    return response
   } catch (error) {
     console.error(error)
   }
 }
 
-async function postToGeneral() {
+async function postToGeneral(onoChannelId) {
   try {
-    const response = await joinGeneralChannel()
-    if (response.ok) {
+    const channelId = await fetchGeneralChannelId()
+    let membership = checkGeneralMembership(channelId)
+    if (!membership) {
+      const response = await joinGeneralChannel(channelId)
+      if (response.ok) membership = true;
+    }
+    if (membership) {
       // Call the chat.postMessage method using the WebClient
-      const result = await app.client.chat.postMessage({
-        channel: response.channel.id,
-        text: "Hello! I am the One-on-One bot. I specialize in pairing individuals in the channel who are interested in learning more about each other in a one-on-one enviornment. Participation is completely optional. To get started, join the @one-on-one channel I created."
+      const response = await app.client.chat.postMessage({
+        channel: channelId,
+        text: `Hello! I am the One-on-One bot. I specialize in pairing individuals in the channel who are interested in learning more about each other in a one-on-one enviornment. Participation is completely optional. To get started, join the <#${onoChannelId}> channel I created.`
       });
+      return response
     }
   }
   catch (error) {

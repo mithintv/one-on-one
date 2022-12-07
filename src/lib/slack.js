@@ -14,7 +14,3 @@ exports.app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   // installationStore: new FileInstallationStore(),
 });
-
-exports.client = new WebClient(process.env.SLACK_BOT_TOKEN, {
-  logLevel: WebLogLevel
-})
