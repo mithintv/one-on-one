@@ -1,9 +1,11 @@
 import app from "../lib/slack.js"
 import { getBotId } from "../functions/bot.js"
 
-export async function fetchGeneralChannelId() {
+export async function fetchGeneralChannelId(token) {
   try {
-    const conversations = await app.client.conversations.list()
+    const conversations = await app.client.conversations.list({
+      token
+    })
     const { id } = conversations.channels.find(channel => channel.name === 'general')
     return id;
   } catch (error) {
@@ -11,21 +13,23 @@ export async function fetchGeneralChannelId() {
   }
 }
 
-export async function checkGeneralMembership(channelId) {
+export async function checkGeneralMembership(token, channelId) {
   try {
     const { members } = await app.client.conversations.members({
+      token,
       channel: channelId
     })
-    const botId = await getBotId()
+    const botId = await getBotId(token)
     return members.find(botId) ? true : false
   } catch (error) {
 
   }
 }
 
-export async function joinGeneralChannel(channelId) {
+export async function joinGeneralChannel(token, channelId) {
   try {
-    const response = app.client.conversations.join({
+    const response = await app.client.conversations.join({
+      token,
       channel: channelId
     })
     return response
@@ -34,22 +38,21 @@ export async function joinGeneralChannel(channelId) {
   }
 }
 
-export async function postToGeneral(onoChannelId) {
+export async function postToGeneral(token, onoChannelId) {
   try {
-    const channelId = await fetchGeneralChannelId()
-    let membership = checkGeneralMembership(channelId)
+    const channelId = await fetchGeneralChannelId(token)
+    const membership = await checkGeneralMembership(token, channelId)
     if (!membership) {
-      const response = await joinGeneralChannel(channelId)
-      if (response.ok) membership = true;
+      await joinGeneralChannel(token, channelId)
     }
-    if (membership) {
-      // Call the chat.postMessage method using the WebClient
-      const response = await app.client.chat.postMessage({
-        channel: channelId,
-        text: `Hello! I am the One-on-One bot. I specialize in pairing individuals in the channel who are interested in learning more about each other in a one-on-one enviornment. Participation is completely optional. To get started, join the <#${onoChannelId}> channel I created.`
-      });
-      return response
-    }
+
+    // Call the chat.postMessage method using the WebClient
+    const response = await app.client.chat.postMessage({
+      token,
+      channel: channelId,
+      text: `Hello! I am the One-on-One bot. I specialize in pairing individuals in the channel who are interested in learning more about each other in a one-on-one enviornment. Participation is completely optional. To get started, join the <#${onoChannelId}> channel I created.`
+    });
+    return response
   }
   catch (error) {
     console.error(error);

@@ -1,4 +1,5 @@
 import app from "./src/lib/slack.js"
+import client from "./src/lib/mongo.js"
 
 // slack functions
 import { fetchGeneralChannelId, postToGeneral } from "./src/functions/general.js";
@@ -7,20 +8,21 @@ import { getBotId } from './src/functions/bot.js';
 import { fetchConversations } from "./src/functions/conversations.js";
 
 
-(async () => {
+await (async () => {
   // Start your app
-  let port = 3080;
-  await app.start();
-
+  const port = process.env.PORT || 3080;
+  await app.start(port);
   console.log(`⚡️ Bolt app is running on port ${port}!`);
+  await client.connect()
+  console.log('Successfully connected to database')
+
 })();
 
-
-async function initialization() {
+export async function initialization(token) {
   try {
-    const response = await createChannel()
+    const response = await createChannel(token)
     if (response.ok) {
-      const success = await postToGeneral(response.onoChannelId)
+      const success = await postToGeneral(token, response.onoChannelId)
       if (success.ok) {
         console.log('successfully posted introduction message in general channel')
       }
@@ -29,7 +31,7 @@ async function initialization() {
     console.error(error);
   }
 }
-// initialization()
+
 
 
 
@@ -90,4 +92,4 @@ async function deleteRecentMessage(channelId) {
 
 
 // deleteRecentMessage(process.env.DM)
-deleteRecentMessage(process.env.GENERAL)
+// deleteRecentMessage(process.env.GENERAL)
