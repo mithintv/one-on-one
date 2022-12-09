@@ -1,6 +1,6 @@
-const { app } = require("../lib/slack")
+import app from "../lib/slack.js"
 
-async function getBotId() {
+export async function getBotId() {
   try {
     const { user_id } = await app.client.auth.test()
     return user_id
@@ -8,5 +8,3 @@ async function getBotId() {
     console.error(error);
   }
 }
-
-module.exports = { getBotId }

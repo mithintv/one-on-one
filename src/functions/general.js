@@ -1,7 +1,7 @@
-const { app } = require("../lib/slack")
-const { getBotId } = require("../functions/bot")
+import app from "../lib/slack.js"
+import { getBotId } from "../functions/bot.js"
 
-async function fetchGeneralChannelId() {
+export async function fetchGeneralChannelId() {
   try {
     const conversations = await app.client.conversations.list()
     const { id } = conversations.channels.find(channel => channel.name === 'general')
@@ -11,7 +11,7 @@ async function fetchGeneralChannelId() {
   }
 }
 
-async function checkGeneralMembership(channelId) {
+export async function checkGeneralMembership(channelId) {
   try {
     const { members } = await app.client.conversations.members({
       channel: channelId
@@ -23,7 +23,7 @@ async function checkGeneralMembership(channelId) {
   }
 }
 
-async function joinGeneralChannel(channelId) {
+export async function joinGeneralChannel(channelId) {
   try {
     const response = app.client.conversations.join({
       channel: channelId
@@ -34,7 +34,7 @@ async function joinGeneralChannel(channelId) {
   }
 }
 
-async function postToGeneral(onoChannelId) {
+export async function postToGeneral(onoChannelId) {
   try {
     const channelId = await fetchGeneralChannelId()
     let membership = checkGeneralMembership(channelId)
@@ -55,6 +55,3 @@ async function postToGeneral(onoChannelId) {
     console.error(error);
   }
 }
-
-
-module.exports = { fetchGeneralChannelId, joinGeneralChannel, postToGeneral }

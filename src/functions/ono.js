@@ -1,7 +1,7 @@
-const { app } = require("../lib/slack")
+import app from "../lib/slack.js"
 
 // creates one-on-one channel and returns ok response and channel id
-async function createChannel() {
+export async function createChannel() {
   try {
     const { ok, channel } = await app.client.conversations.create({
       name: "one-on-one"
@@ -15,4 +15,6 @@ async function createChannel() {
   }
 }
 
-module.exports = { createChannel }
+export async function setTimer() {
+
+}

@@ -1,9 +1,10 @@
-require("dotenv").config()
+import "dotenv/config"
+import bolt from '@slack/bolt'
+const { App, LogLevel } = bolt
+import oauth from '@slack/oauth'
+const { FileInstallationStore } = oauth
 
-const { App, LogLevel } = require('@slack/bolt');
-const { FileInstallationStore } = require('@slack/oauth');
-
-exports.app = new App({
+export default new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   // clientId: process.env.SLACK_CLIENT_ID,
