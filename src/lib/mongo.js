@@ -11,6 +11,19 @@ if (process.env.NODE_ENV !== "production") {
   uri = 'mongodb://localhost:27017/one-on-one';
 }
 
-const client = new MongoClient(uri);
+const mongo = new MongoClient(uri);
 
-export default client;
+export async function saveInstallation(installation) {
+  const workspaces = mongo.db("one-on-one").collection("workspaces");
+  const result = await workspaces.insertOne(installation);
+  return result;
+}
+
+export async function deleteInstallation(team_id) {
+  const workspaces = mongo.db("one-on-one").collection("workspaces");
+  const query = { "team.id": team_id };
+  const result = await workspaces.deleteOne(query);
+  return result;
+}
+
+export default mongo;
