@@ -1,6 +1,6 @@
 import "dotenv/config";
-
-import mongo from "../lib/mongo.js";
+import axios from 'axios';
+import mongo, { saveInstallation, deleteInstallation } from "../lib/mongo.js";
 
 
 import { WebClient, LogLevel } from "@slack/web-api";
@@ -11,6 +11,36 @@ const slack = new WebClient(process.env.OAUTH_TOKEN, {
   // LogLevel can be imported and used to make debugging simpler
   logLevel: LogLevel.DEBUG
 });
+
+// install function
+export async function install(code) {
+  const data = {
+    code,
+    client_id: process.env.SLACK_CLIENT_ID,
+    client_secret: process.env.SLACK_CLIENT_SECRET
+  };
+  const response = await axios.postForm('https://slack.com/api/oauth.v2.access', data,
+    { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
+  ).then(async function (response) {
+    const result = await saveInstallation(response.data);
+    if (result.acknowledged) {
+      console.log(`successfully installed new workspace with id: ${result.insertedId}`);
+      return result.acknowledged;
+    }
+  }).catch(error => {
+    console.log(error);
+  });
+  return response;
+}
+
+// uninstall function
+export async function uninstall(req) {
+  const { team_id } = await req.body;
+  const result = await deleteInstallation(team_id);
+  if (result.deletedCount === 1) {
+    console.log(`successfully deleted workspace with team_id: ${team_id}`);
+  };
+}
 
 export default slack;
 

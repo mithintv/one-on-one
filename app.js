@@ -9,6 +9,7 @@ import { fetchGeneralChannelId, postToGeneral } from "./src/functions/general.js
 import { createChannel } from "./src/functions/ono.js";
 import { getBotId } from './src/functions/bot.js';
 import { fetchConversations } from "./src/functions/conversations.js";
+import { install, uninstall } from "./src/lib/slack.js";
 
 const app = express();
 app.use(express.json());
@@ -25,33 +26,16 @@ app.get('/slack/install', async (req, res) => {
 
 app.get('/slack/oauth_redirect', async (req, res) => {
   const { code, state } = req.query;
-  const data = {
-    code,
-    client_id: process.env.SLACK_CLIENT_ID,
-    client_secret: process.env.SLACK_CLIENT_SECRET
-  };
-  await axios.postForm('https://slack.com/api/oauth.v2.access', data,
-    { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
-  ).then(async function (response) {
-    const result = await saveInstallation(response.data);
-    if (result.acknowledged) {
-      console.log(`successfully installed new workspace with id: ${result.insertedId}`);
-      res.send('installation successful');
-    }
-  }).catch(error => {
-    console.log(error);
-  });
-
+  if (state === process.env.SLACK_STATE) {
+    const result = await install(code);
+    if (result) res.send('installation successful');
+  }
 });
 
 app.post('/slack/events', async (req, res) => {
   res.sendStatus(200);
   if (req.body.event.type === 'app_uninstalled') {
-    const { team_id } = await req.body;
-    const result = await deleteInstallation(team_id);
-    if (result.deletedCount === 1) {
-      console.log(`successfully deleted workspace with team_id: ${team_id}`);
-    };
+    await uninstall(req);
   } else {
     console.log('recieved event');
     console.log(req.body);
