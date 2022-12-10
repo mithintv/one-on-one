@@ -1,11 +1,8 @@
-import app from "../lib/slack.js"
 
-export async function getBotId(token) {
+export async function getBotId(slack) {
   try {
-    const { user_id } = await app.client.auth.test({
-      token
-    })
-    return user_id
+    const { user_id } = await slack.auth.test();
+    return user_id;
   } catch (error) {
     console.error(error);
   }

@@ -5,12 +5,7 @@ import mongo, { saveInstallation, deleteInstallation } from "../lib/mongo.js";
 
 import { WebClient, LogLevel } from "@slack/web-api";
 
-// WebClient instantiates a client that can call API methods
-// When using Bolt, you can use either `app.client` or the `client` passed to listeners.
-const slack = new WebClient(process.env.OAUTH_TOKEN, {
-  // LogLevel can be imported and used to make debugging simpler
-  logLevel: LogLevel.DEBUG
-});
+
 
 // install function
 export async function install(code) {
@@ -22,10 +17,12 @@ export async function install(code) {
   const response = await axios.postForm('https://slack.com/api/oauth.v2.access', data,
     { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
   ).then(async function (response) {
+    const { authed_user: { access_token } } = response.data;
     const result = await saveInstallation(response.data);
+    const slack = getAuth(response.data.access_token);
     if (result.acknowledged) {
       console.log(`successfully installed new workspace with id: ${result.insertedId}`);
-      return result.acknowledged;
+      return { slack, user_token: access_token, response: result.acknowledged };
     }
   }).catch(error => {
     console.log(error);
@@ -42,7 +39,17 @@ export async function uninstall(req) {
   };
 }
 
-export default slack;
+// WebClient instantiates a client that can call API methods
+// When using Bolt, you can use either `app.client` or the `client` passed to listeners.
+export default function getAuth(token) {
+  const slack = new WebClient(token, {
+    // LogLevel can be imported and used to make debugging simpler
+    // logLevel: LogLevel.DEBUG
+  });
+  return slack;
+}
+
+
 
 // const app = new App({
 //   clientId: process.env.SLACK_CLIENT_ID,

@@ -6,7 +6,7 @@ import mongo, { saveInstallation, deleteInstallation } from "./src/lib/mongo.js"
 
 // slack functions
 import { fetchGeneralChannelId, postToGeneral } from "./src/functions/general.js";
-import { createChannel } from "./src/functions/ono.js";
+import { createChannel, setTimer } from "./src/functions/ono.js";
 import { getBotId } from './src/functions/bot.js';
 import { fetchConversations } from "./src/functions/conversations.js";
 import { install, uninstall } from "./src/lib/slack.js";
@@ -21,14 +21,17 @@ console.log('Successfully connected to database');
 
 
 app.get('/slack/install', async (req, res) => {
-  res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.SLACK_CLIENT_ID}&state=${process.env.SLACK_STATE}&scope=channels:history,channels:join,channels:manage,channels:read,chat:write,groups:history,groups:read,im:history,im:read,mpim:history,mpim:read,mpim:write,im:write,groups:write&user_scope=`);
+  res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.SLACK_CLIENT_ID}&state=${process.env.SLACK_STATE}&scope=channels:history,channels:join,channels:manage,channels:read,chat:write,groups:history,groups:read,groups:write,im:history,im:read,im:write,mpim:history,mpim:read,mpim:write,reminders:write,reminders:read&user_scope=reminders:read,reminders:write`);
 });
 
 app.get('/slack/oauth_redirect', async (req, res) => {
   const { code, state } = req.query;
   if (state === process.env.SLACK_STATE) {
-    const result = await install(code);
-    if (result) res.send('installation successful');
+    const { slack, user_token, response } = await install(code);
+    if (response) {
+      res.send('installation successful');
+      await initialization(slack, user_token);
+    }
   }
 });
 
@@ -51,15 +54,16 @@ app.listen(port, () => {
 
 
 
-export async function initialization(token) {
+export async function initialization(slack, user_token) {
   try {
-    const response = await createChannel(token);
-    if (response.ok) {
-      const success = await postToGeneral(token, response.onoChannelId);
+    const { ok, onoChannelId } = await createChannel(slack);
+    if (ok) {
+      const success = await postToGeneral(slack, onoChannelId);
       if (success.ok) {
         console.log('successfully posted introduction message in general channel');
       }
     }
+    const reminder = await setTimer(slack, user_token);
   } catch (error) {
     console.error(error);
   }
