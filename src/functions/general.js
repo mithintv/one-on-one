@@ -1,4 +1,4 @@
-import slack from "../lib/slack.js";
+import slack from "../lib/slackConfig.js";
 import { getBotId } from "../functions/bot.js";
 
 export async function fetchGeneralChannelId(slack) {

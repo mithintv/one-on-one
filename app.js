@@ -1,58 +1,28 @@
-import express from "express";
-import axios from 'axios';
+import mongo from "./src/lib/mongo.js";
+import app from "./src/lib/slackConfig.js";
 
-// import slack from "./src/lib/slack.js";
-import mongo, { saveInstallation, deleteInstallation } from "./src/lib/mongo.js";
+
+// slack events
+import registerListeners from "./src/listeners/index.js";
 
 // slack functions
 import { fetchGeneralChannelId, postToGeneral } from "./src/functions/general.js";
 import { createChannel, setTimer } from "./src/functions/ono.js";
 import { getBotId } from './src/functions/bot.js';
 import { fetchConversations } from "./src/functions/conversations.js";
-import { install, uninstall } from "./src/lib/slack.js";
+import { install, uninstall } from "./src/lib/slackConfig.js";
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-const port = process.env.PORT || 3080;
 
 await mongo.connect();
 console.log('Successfully connected to database');
 
+// registers commands for bot
+registerListeners(app);
 
-app.get('/slack/install', async (req, res) => {
-  res.redirect(`https://slack.com/oauth/v2/authorize?client_id=${process.env.SLACK_CLIENT_ID}&state=${process.env.SLACK_STATE}&scope=channels:history,channels:join,channels:manage,channels:read,chat:write,groups:history,groups:read,groups:write,im:history,im:read,im:write,mpim:history,mpim:read,mpim:write,reminders:write,reminders:read&user_scope=reminders:read,reminders:write`);
-});
-
-app.get('/slack/oauth_redirect', async (req, res) => {
-  const { code, state } = req.query;
-  if (state === process.env.SLACK_STATE) {
-    const { slack, user_token, response } = await install(code);
-    if (response) {
-      res.send('installation successful');
-      await initialization(slack, user_token);
-    }
-  }
-});
-
-app.post('/slack/events', async (req, res) => {
-  res.sendStatus(200);
-  if (req.body.event.type === 'app_uninstalled') {
-    await uninstall(req);
-  } else {
-    console.log('recieved event');
-    console.log(req.body);
-  }
-});
-
-
-app.listen(port, () => {
-  console.log(`ONO Bot is running on port ${port}!`);
-});
-
-
-
-
+(async () => {
+  await app.start(3080);
+  console.log('Express app is running');
+})();
 
 export async function initialization(slack, user_token) {
   try {
