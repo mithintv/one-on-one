@@ -1,6 +1,4 @@
-import app from "../lib/slackConfig.js";
-
-const pairFunction = async ({ client, command, ack, respond }) => {
+const pair = async ({ client, command, ack, respond }) => {
 
   try {
     // Acknowledge command request
@@ -57,15 +55,28 @@ const pairFunction = async ({ client, command, ack, respond }) => {
     console.log(pairings);
     await respond(pairings);
 
-
   } catch (error) {
     console.error(error);
   }
-
 };
+
+
+const frequency = async ({ client, command, ack, respond }) => {
+  try {
+    // Acknowledge command request
+    await ack();
+
+    console.log(command);
+  }
+  catch (error) {
+    console.error(error);
+  }
+};
+
 
 
 export default function registerCommands(app) {
 
-  app.command('/pair', pairFunction);
+  app.command('/pair', pair);
+  app.command('/frequency', frequency);
 }
