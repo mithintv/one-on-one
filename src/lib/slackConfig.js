@@ -87,7 +87,7 @@ receiver.app.use('/slack', slack);
 
 const app = new App({
   receiver,
-  // logLevel: LogLevel.DEBUG
+  logLevel: LogLevel.DEBUG
 });
 
 
