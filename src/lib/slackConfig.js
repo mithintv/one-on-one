@@ -2,7 +2,7 @@ import "dotenv/config";
 // import axios from 'axios';
 
 import pkg from "@slack/bolt";
-import mongo, { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
+import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
 
 // custom routes
 import slack from "../routes/slack.js";

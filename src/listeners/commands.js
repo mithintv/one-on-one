@@ -1,4 +1,5 @@
 import mongo from "../lib/mongo.js";
+import shuffle from "../functions/shuffle.js";
 
 const pair = async ({ client, command, ack, respond }) => {
 
@@ -8,55 +9,45 @@ const pair = async ({ client, command, ack, respond }) => {
 
     // Obtain channel id where command was executed
     const { channel_id } = command;
+
     // Get list of members in channel
     let { members } = await client.conversations.members({
       channel: channel_id
     });
 
-    // Filter out bot from list of members
+    // Obtain bot id
     const { user_id } = await client.auth.test();
-    members = members.filter(member => member !== user_id);
-    members = members.filter(member => member !== 'U04EMKFLADB');
 
+    // If bot is not in channel, respond with failure, else filter bot out of members to initiate pairing
+    if (!members.includes(user_id)) {
+      await respond(`/pair can only be called on channels that the <@${user_id}> has joined`);
+      return;
+    } else {
+      members = members.filter(member => member !== user_id);
+      // Comment below line to create odd pairings
+      members = members.filter(member => member !== 'U04EMKFLADB');
 
-    // Shuffle members array
-    function shuffle(array) {
-      let currentIndex = array.length, randomIndex;
+      // Shuffle members array
+      members = shuffle(members);
+      console.log(members);
 
-      // While there remain elements to shuffle.
-      while (currentIndex != 0) {
+      // Create output message for pairings
+      let pairings = "Here are this week's pairings: \n";
 
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [array[currentIndex], array[randomIndex]] = [
-          array[randomIndex], array[currentIndex]];
+      // Even pairings
+      for (let i = 0; i < members.length; i++) {
+        if (i % 2 === 0) {
+          pairings = pairings.concat(`<@${members[i]}>`, ' <-> ');
+        } else pairings = pairings.concat(`<@${members[i]}>`, '\n');
+      }
+      // Odd pairings
+      if (members.length % 2 !== 0) {
+        pairings = pairings.concat(`<@${members[0]}>`);
       }
 
-      return array;
+      console.log(pairings);
+      await respond(pairings);
     }
-    members = shuffle(members);
-    console.log(members);
-
-    // Create output message for pairings
-    let pairings = "Here are this week's pairings: \n";
-
-    // Even pairings
-    for (let i = 0; i < members.length; i++) {
-      if (i % 2 === 0) {
-        pairings = pairings.concat(`<@${members[i]}>`, ' <-> ');
-      } else pairings = pairings.concat(`<@${members[i]}>`, '\n');
-    }
-    // Odd pairings
-    if (members.length % 2 !== 0) {
-      pairings = pairings.concat(`<@${members[0]}>`);
-    }
-
-    console.log(pairings);
-    await respond(pairings);
-
   } catch (error) {
     console.error(error);
   }
