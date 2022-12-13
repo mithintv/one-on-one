@@ -1,27 +1,7 @@
 import mongo from "../lib/mongo.js";
 import shuffle from "../functions/shuffle.js";
 
-const checkBotMembership = async (command, client) => {
-  // Obtain channel id where command was executed
-  const { channel_id } = command;
-  // Get list of members in channel
-  let { members } = await client.conversations.members({
-    channel: channel_id
-  });
-  // Obtain bot id
-  const { user_id: bot_id } = await client.auth.test();
-
-  // Return membership status
-  if (members.includes(bot_id)) {
-    // If bot is a member, return members array without bot
-    members = members.filter(member => member !== bot_id);
-    return { bot_id, members, membership: true };
-  }
-  // Otherwise, return members as is with membership set to false
-  else {
-    return { bot_id, members, membership: false };
-  };
-};
+import { checkBotMembership } from "../functions/bot.js";
 
 const pair = async ({ client, command, ack, respond }) => {
 
