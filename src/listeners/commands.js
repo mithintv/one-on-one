@@ -1,3 +1,5 @@
+import mongo from "../lib/mongo.js";
+
 const pair = async ({ client, command, ack, respond }) => {
 
   try {
@@ -65,6 +67,22 @@ const frequency = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
     await ack();
+
+    // Obtain user and channel_id
+    const { user_id, channel_id } = command;
+    await mongo.connect();
+    const workspaces = mongo.db('one-on-one').collection('workspaces');
+    const team = workspaces.findOne({ 'team.id': team_id });
+
+    // Check if bot is in the channel
+
+
+    // create a document that sets the plot of the movie
+    const updateDoc = {
+      $set: {
+        [channel_id]: `A harvest of random numbers, such as: ${Math.random()}`
+      },
+    };
 
     console.log(command);
   }
