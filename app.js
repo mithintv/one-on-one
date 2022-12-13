@@ -9,8 +9,7 @@ import registerListeners from "./src/listeners/index.js";
 import { fetchGeneralChannelId, postToGeneral } from "./src/functions/general.js";
 import { createChannel, setTimer } from "./src/functions/ono.js";
 import { getBotId } from './src/functions/bot.js';
-import { fetchConversations } from "./src/functions/conversations.js";
-import { install, uninstall } from "./src/lib/slackConfig.js";
+
 
 
 await mongo.connect();

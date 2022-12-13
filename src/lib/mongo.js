@@ -14,16 +14,24 @@ if (process.env.NODE_ENV !== "production") {
 const mongo = new MongoClient(uri);
 
 export async function saveInstallation(installation) {
+  await mongo.connect();
   const workspaces = mongo.db("one-on-one").collection("workspaces");
   const result = await workspaces.insertOne(installation);
   return result;
 }
 
-export async function deleteInstallation(team_id) {
+export async function fetchInstallation(installQuery) {
+  await mongo.connect();
   const workspaces = mongo.db("one-on-one").collection("workspaces");
-  const query = { "team.id": team_id };
+  return await workspaces.findOne({ "team.id": installQuery.teamId });
+}
+
+export async function deleteInstallation(team_id) {
+  await mongo.connect();
+  const workspaces = mongo.db("one-on-one").collection("workspaces");
+  const query = await workspaces.findOne({ 'team.id': team_id });
   const result = await workspaces.deleteOne(query);
-  return result;
+  return { query, result };
 }
 
 export default mongo;
