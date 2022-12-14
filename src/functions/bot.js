@@ -1,7 +1,7 @@
 
-export async function getBotId(slack) {
+export async function getBotId(client) {
   try {
-    const { user_id } = await slack.auth.test();
+    const { user_id } = await client.auth.test();
     return user_id;
   } catch (error) {
     console.error(error);
