@@ -50,7 +50,8 @@ const joined = async ({ client, event }) => {
         const channelObject = members.reduce((acc, curr) => {
           acc[curr] = {
             frequency: '14',
-            lastPairing: ''
+            lastPairing: '',
+            restrict: []
           };
           return acc;
         }, {});
