@@ -48,7 +48,10 @@ const joined = async ({ client, event }) => {
 
         // Create channel object to insert into DB
         const channelObject = members.reduce((acc, curr) => {
-          acc[curr] = '14';
+          acc[curr] = {
+            frequency: '14',
+            lastPairing: ''
+          };
           return acc;
         }, {});
         channelObject['isActive'] = true;
@@ -64,7 +67,11 @@ const joined = async ({ client, event }) => {
       else {
         for (let i = 0; i < members.length; i++) {
           if (!channel[members[i]]) {
-            channel[members[i]] = '14';
+            channel[members[i]] = {
+              frequency: '14',
+              lastPairing: '',
+              restrict: []
+            };
           }
         }
 

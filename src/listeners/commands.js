@@ -66,19 +66,23 @@ const frequency = async ({ client, command, ack, respond }) => {
       // Fetch installtion
       const team = await fetchInstallation({}, team_id);
       // If no parameters are set, output current frequency
-      const frequency = team[channel_id][user_id];
+      const frequency = team[channel_id][user_id].frequency;
       if (!text) {
         await respond(`Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
       }
       // If a parameter is passed and is a valid number from 1 to 365, set it as new frequency
       else if (text && parseInt(text) !== NaN && parseInt(text) >= 1 && parseInt(text) <= 90) {
         const channel = team[channel_id];
+        const user = channel[user_id];
         // Create a document that sets the frequency of specific user
         const updateDoc = {
           $set: {
             [channel_id]: {
               ...channel,
-              [user_id]: text,
+              [user_id]: {
+                ...user,
+                frequency: text
+              },
             }
           },
         };
