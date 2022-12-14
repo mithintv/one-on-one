@@ -1,4 +1,4 @@
-import mongo, { deleteInstallation, fetchInstallation } from "../lib/mongo.js";
+import mongo, { deleteInstallation, fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership, getBotId } from "../functions/bot.js";
 
@@ -79,8 +79,7 @@ const joined = async ({ client, event }) => {
         };
       }
       // Save default frequency for each member in channel if channel object doesn't exist or save default frequency for new members in channel if channel object already exists
-      const workspaces = mongo.db("one-on-one").collection("workspaces");
-      const result = await workspaces.updateOne({ id: team.id }, updateDoc);
+      const result = await updateInstallation(team_id, updateDoc);
       console.log(result);
     }
 

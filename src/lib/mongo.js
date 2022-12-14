@@ -26,6 +26,12 @@ export async function fetchInstallation(installQuery, teamId = installQuery.team
   return await workspaces.findOne({ "team.id": teamId });
 }
 
+export async function updateInstallation(teamId, updateDoc) {
+  await mongo.connect();
+  const workspaces = mongo.db("one-on-one").collection("workspaces");
+  return await workspaces.updateOne({ "team.id": teamId }, updateDoc);
+}
+
 export async function deleteInstallation(team_id) {
   await mongo.connect();
   const workspaces = mongo.db("one-on-one").collection("workspaces");
