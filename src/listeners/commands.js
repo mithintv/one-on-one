@@ -66,12 +66,12 @@ const frequency = async ({ client, command, ack, respond }) => {
       // Fetch installtion
       const team = await fetchInstallation({}, team_id);
       // If no parameters are set, output current frequency
+      const frequency = team[channel_id][user_id];
       if (!text) {
-        const frequency = team[channel_id][user_id];
         await respond(`Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
       }
       // If a parameter is passed and is a valid number from 1 to 365, set it as new frequency
-      else if (text && parseInt(text) !== NaN && parseInt(text) >= 1 && parseInt(text) <= 365) {
+      else if (text && parseInt(text) !== NaN && parseInt(text) >= 1 && parseInt(text) <= 90) {
         const channel = team[channel_id];
         // Create a document that sets the frequency of specific user
         const updateDoc = {
@@ -85,6 +85,9 @@ const frequency = async ({ client, command, ack, respond }) => {
         const result = await updateInstallation(team_id, updateDoc);
         console.log(result);
         await respond(`Your new frequency of one-on-one's in this channel is every ${text} days.`);
+      }
+      else {
+        await respond(`You inputted an invalid value for frequency of one-on-one's. Only numeric values from 1 to 90 are accepted. Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
       }
     }
   }
