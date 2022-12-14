@@ -1,5 +1,7 @@
-import mongo from "../lib/mongo.js";
+import mongo, { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 import shuffle from "../functions/shuffle.js";
+
+import { checkBotMembership } from "../functions/bot.js";
 
 const pair = async ({ client, command, ack, respond }) => {
 
@@ -7,23 +9,13 @@ const pair = async ({ client, command, ack, respond }) => {
     // Acknowledge command request
     await ack();
 
-    // Obtain channel id where command was executed
-    const { channel_id } = command;
-
-    // Get list of members in channel
-    let { members } = await client.conversations.members({
-      channel: channel_id
-    });
-
-    // Obtain bot id
-    const { user_id } = await client.auth.test();
-
-    // If bot is not in channel, respond with failure, else filter bot out of members to initiate pairing
-    if (!members.includes(user_id)) {
-      await respond(`/pair can only be called on channels that the <@${user_id}> has joined`);
+    const { bot_id, members, membership } = await checkBotMembership(command, client);
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
-      members = members.filter(member => member !== user_id);
+
       // Comment below line to create odd pairings
       members = members.filter(member => member !== 'U04EMKFLADB');
 
@@ -58,24 +50,46 @@ const frequency = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
     await ack();
-
+    console.log(command);
     // Obtain user and channel_id
-    const { user_id, channel_id } = command;
-    await mongo.connect();
-    const workspaces = mongo.db('one-on-one').collection('workspaces');
-    const team = workspaces.findOne({ 'team.id': team_id });
+    const { user_id, channel_id, team_id, text } = command;
 
     // Check if bot is in the channel
+    const { bot_id, members, membership } = await checkBotMembership(command, client);
 
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/frequency can only be called on channels that <@${bot_id}> has joined`);
+      return;
+    } else {
 
-    // create a document that sets the plot of the movie
-    const updateDoc = {
-      $set: {
-        [channel_id]: `A harvest of random numbers, such as: ${Math.random()}`
-      },
-    };
-
-    console.log(command);
+      // Fetch installtion
+      const team = await fetchInstallation({}, team_id);
+      // If no parameters are set, output current frequency
+      const frequency = team[channel_id][user_id];
+      if (!text) {
+        await respond(`Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
+      }
+      // If a parameter is passed and is a valid number from 1 to 365, set it as new frequency
+      else if (text && parseInt(text) !== NaN && parseInt(text) >= 1 && parseInt(text) <= 90) {
+        const channel = team[channel_id];
+        // Create a document that sets the frequency of specific user
+        const updateDoc = {
+          $set: {
+            [channel_id]: {
+              ...channel,
+              [user_id]: text,
+            }
+          },
+        };
+        const result = await updateInstallation(team_id, updateDoc);
+        console.log(result);
+        await respond(`Your new frequency of one-on-one's in this channel is every ${text} days.`);
+      }
+      else {
+        await respond(`You inputted an invalid value for frequency of one-on-one's. Only numeric values from 1 to 90 are accepted. Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
+      }
+    }
   }
   catch (error) {
     console.error(error);

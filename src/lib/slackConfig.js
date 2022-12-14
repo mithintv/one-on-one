@@ -16,8 +16,9 @@ export const receiver = new ExpressReceiver({
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   stateSecret: process.env.SLACK_STATE,
-  scopes: ['channels:history', 'channels:join', 'channels:manage', 'channels:read', 'chat:write', 'groups:history', 'groups:read', 'groups:write', 'im:history', 'im:read', 'im:write', 'mpim:history', 'mpim:read', 'mpim:write', 'commands'],
+  scopes: ['channels:history', 'channels:read', 'chat:write', 'commands', 'groups:history', 'groups:read', 'im:history', 'im:read', 'mpim:history', 'mpim:read', 'app_mentions:read'],
   installerOptions: {
+    userScopes: ['channels:read', 'groups:read'],
     // If below is true, /slack/install redirects installers to the Slack authorize URL
     // without rendering the web page with "Add to Slack" button.
     // This flag is available in @slack/bolt v3.7 or higher
