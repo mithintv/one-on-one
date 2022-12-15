@@ -89,6 +89,34 @@ const joined = async ({ client, event }) => {
       // Save default frequency for each member in channel if channel object doesn't exist or save default frequency for new members in channel if channel object already exists
       const result = await updateInstallation(team_id, updateDoc);
       console.log(result);
+
+      // Send /reminder to slack bot to message bot to send pairing
+      await client.chat.postMessage({
+        channel: channel_id,
+        text: 'Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in 7 days and further parings will be posted monthly.',
+      });
+
+      const currentDate = new Date(Date.now());
+      console.log(currentDate);
+      const currentSeconds = currentDate.getSeconds();
+      console.log(currentSeconds);
+      currentDate.setSeconds(currentSeconds + 10);
+      console.log(currentDate);
+      console.log(currentDate.getTime());
+
+      const reminder = await client.reminders.add({
+        text: 'pair',
+        time: Math.floor(currentDate.getTime() / 1000),
+      });
+
+      console.log(reminder);
+
+      const schedule = await client.chat.scheduleMessage({
+        channel: channel_id,
+        post_at: Math.floor(currentDate.getTime() / 1000),
+        text: `<@${bot_id}> is creating your one-on-one pairings for this month!`
+      });
+      console.log(schedule);
     }
 
   } catch (error) {
@@ -133,10 +161,18 @@ const left = async ({ client, event }) => {
   }
 };
 
+const reminder = async ({ client, event }) => {
+  try {
+    console.log(event);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default function registerEvents(app) {
   app.event('app_uninstalled', uninstall);
   app.event('app_mention', mention);
   app.event('member_joined_channel', joined);
   app.event('member_left_channel', left);
+  app.event('message', reminder);
 }
