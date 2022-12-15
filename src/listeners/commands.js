@@ -9,7 +9,8 @@ const pair = async ({ client, command, ack, respond }) => {
     // Acknowledge command request
     await ack();
 
-    const { bot_id, members, membership } = await checkBotMembership(command, client);
+    const { bot_id, membership } = await checkBotMembership(command, client);
+    let { members } = await checkBotMembership(command, client);
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
@@ -100,7 +101,7 @@ const frequency = async ({ client, command, ack, respond }) => {
   }
 };
 
-const restrict = async ({ client, command, ack, respond }) => {
+const block = async ({ client, command, ack, respond }) => {
   try {
     console.log(command);
 
@@ -115,21 +116,21 @@ const restrict = async ({ client, command, ack, respond }) => {
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
-      await respond(`/restrict can only be called on channels that <@${bot_id}> has joined`);
+      await respond(`/block can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
 
       // Fetch installtion
       let team = await fetchInstallation({}, team_id);
       // If no parameters are set, output current restrictions
-      let restrict = team[channel_id][user_id].restrict;
-      if (!text && restrict.length === 0) {
+      let block = team[channel_id][user_id].restrict;
+      if (!text && block.length === 0) {
         await respond("You are currenlt being paired with everyone on this channel for one-on-one's with no restrictions.");
       }
       else if (!text) {
         let response = "You are currently not being paired with the following members in this channel for one-on-one's:\n";
-        console.log(restrict);
-        restrict.forEach(element => {
+        console.log(block);
+        block.forEach(element => {
           response = response + `<@${element}>\n`;
         });
         await respond(response);
@@ -175,9 +176,9 @@ const restrict = async ({ client, command, ack, respond }) => {
         console.log(result);
         // Fetch updated installtion and updated restrictions
         team = await fetchInstallation({}, team_id);
-        restrict = team[channel_id][user_id].restrict;
+        block = team[channel_id][user_id].restrict;
         let response = "You are currently not being paired with the following members in this channel:\n";
-        restrict.forEach(element => {
+        block.forEach(element => {
           response = response + `<@${element}>\n`;
         });
         await respond(response);
@@ -195,5 +196,5 @@ export default function registerCommands(app) {
 
   app.command('/pair', pair);
   app.command('/frequency', frequency);
-  app.command('/restrict', restrict);
+  app.command('/block', block);
 }
