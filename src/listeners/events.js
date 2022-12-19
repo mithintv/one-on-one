@@ -2,6 +2,8 @@ import mongo, { deleteInstallation, fetchInstallation, updateInstallation } from
 
 import { checkBotMembership, getBotId } from "../functions/bot.js";
 
+import eventHandler, { newChannel, oldChannel } from "./handlers/eventHandlers.js";
+
 const mention = async ({ client, event, respond }) => {
   try {
     console.log(event);
@@ -30,62 +32,16 @@ const joined = async ({ client, event }) => {
     const bot_id = await getBotId(client);
     if (bot_id === event.user) {
 
-      // Get team_id and channel_id
-      const { team: team_id, channel: channel_id } = event;
-
-      // Get team in DB
-      const team = await fetchInstallation({}, team_id);
-
-      // Check channel existence
-      const channel = team[channel_id];
-      let updateDoc = {};
+      // Get event details
+      const { channelObj: channel, channel_id, team_id } = await eventHandler(event);
 
       // Get members of channel
       const { members } = await checkBotMembership(event, client);
 
-      // If channel doesn't exist, create one with default values
-      if (!channel) {
+      // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
+      let updateDoc = {};
+      channel ? updateDoc = oldChannel(members, channel_id, channel) : updateDoc = newChannel(members, channel_id);
 
-        // Create channel object to insert into DB
-        const channelObject = members.reduce((acc, curr) => {
-          acc[curr] = {
-            frequency: '14',
-            lastPairing: '',
-            restrict: []
-          };
-          return acc;
-        }, {});
-        channelObject['isActive'] = true;
-
-        // Create doc to insert into DB
-        updateDoc = {
-          $set: {
-            [channel_id]: channelObject
-          },
-        };
-      }
-      // Otherwise, set default values for any new members and keep existing values for all other members
-      else {
-        for (let i = 0; i < members.length; i++) {
-          if (!channel[members[i]]) {
-            channel[members[i]] = {
-              frequency: '14',
-              lastPairing: '',
-              restrict: []
-            };
-          }
-        }
-
-        // Create doc to insert into DB
-        updateDoc = {
-          $set: {
-            [channel_id]: {
-              ...channel,
-              isActive: true
-            }
-          },
-        };
-      }
       // Save default frequency for each member in channel if channel object doesn't exist or save default frequency for new members in channel if channel object already exists
       const result = await updateInstallation(team_id, updateDoc);
       console.log(result);
@@ -139,14 +95,7 @@ const left = async ({ client, event }) => {
 
     if (bot_id === user_id) {
       // Create update doc
-      const updateDoc = {
-        $set: {
-          [channel_id]: {
-            ...channel,
-            isActive: false
-          }
-        },
-      };
+      const updateDoc = leaveChannel(channel, channel_id);
 
       // Set is Active to false upon ONO bot being removed from channel
       const workspaces = mongo.db("one-on-one").collection("workspaces");
