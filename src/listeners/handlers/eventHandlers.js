@@ -1,8 +1,15 @@
 import { fetchInstallation } from "../../lib/mongo";
+import { checkBotMembership } from "../../functions/bot";
 
-export default async function eventHandler({ event }) {
+export default async function eventHandler(client, event) {
+  // Get bot id
+  const bot_id = await getBotId(client);
+
+  // Get members of channel
+  const { members, membership } = await checkBotMembership(event, client);
+
   // Get team_id and channel_id from event
-  const { team: team_id, channel: channel_id } = event;
+  const { team: team_id, channel: channel_id, user: user_id } = event;
 
   // Get team in DB
   const teamObj = await fetchInstallation({}, team_id);
@@ -10,7 +17,7 @@ export default async function eventHandler({ event }) {
   // Check channel existence
   const channelObj = teamObj[channel_id];
 
-  return { channelObj, channel_id, team_id };
+  return { channelObj, channel_id, team_id, user_id, bot_id, membership, members };
 }
 
 
@@ -75,12 +82,46 @@ export const oldChannel = (members, channel_id, channel) => {
 };
 
 
-export const leaveChannel = (channel, channel_id) => {
+export const leaveChannel = (channel_id, channel) => {
   return {
     $set: {
       [channel_id]: {
         ...channel,
         isActive: false
+      }
+    },
+  };
+};
+
+
+export const memberJoins = (user_id, channel_id, channel) => {
+  // Create doc to insert into DB
+  return {
+    $set: {
+      [channel_id]: {
+        ...channel,
+        [user_id]: {
+          frequency: '14',
+          lastPairing: '',
+          restrict: [],
+          isActive: true,
+        }
+      }
+    },
+  };
+};
+
+
+export const memberLeaves = (user_id, user, channel_id, channel) => {
+  // Create doc to insert into DB
+  return {
+    $set: {
+      [channel_id]: {
+        ...channel,
+        [user_id]: {
+          ...user,
+          isActive: false
+        }
       }
     },
   };
