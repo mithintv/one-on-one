@@ -104,12 +104,12 @@ const joined = async ({ client, event }) => {
       console.log(currentDate);
       console.log(currentDate.getTime());
 
-      const reminder = await client.reminders.add({
-        text: 'pair',
-        time: Math.floor(currentDate.getTime() / 1000),
-      });
+      // const reminder = await client.reminders.add({
+      //   text: 'pair',
+      //   time: Math.floor(currentDate.getTime() / 1000),
+      // });
 
-      console.log(reminder);
+      // console.log(reminder);
 
       const schedule = await client.chat.scheduleMessage({
         channel: channel_id,
@@ -127,18 +127,17 @@ const joined = async ({ client, event }) => {
 const left = async ({ client, event }) => {
   try {
     console.log(event);
+    // Get team_id and channel_id
+    const { team: team_id, channel: channel_id, user: user_id } = event;
+
+    // Get team in DB
+    const team = await fetchInstallation({}, team_id);
+    const channel = team[channel_id];
 
     // Run function only if joined member is ONO bot
     const bot_id = await getBotId(client);
-    if (bot_id === event.user) {
 
-      // Get team_id and channel_id
-      const { team: team_id, channel: channel_id } = event;
-
-      // Get team in DB
-      const team = await fetchInstallation({}, team_id);
-      const channel = team[channel_id];
-
+    if (bot_id === user_id) {
       // Create update doc
       const updateDoc = {
         $set: {
@@ -154,6 +153,26 @@ const left = async ({ client, event }) => {
       const result = await workspaces.updateOne(team, updateDoc);
       console.log(result);
 
+    } else {
+      // Fetch user object from DB
+      const user = channel[user_id];
+
+      // Create update doc
+      const updateDoc = {
+        $set: {
+          [channel_id]: {
+            ...channel,
+            [user_id]: {
+              ...user,
+              isActive: false
+            }
+          }
+        },
+      };
+      // Set isActive to false upon a user leaving or being removed from the channel
+      const workspaces = mongo.db("one-on-one").collection("workspaces");
+      const result = await workspaces.updateOne(team, updateDoc);
+      console.log(result);
     }
 
   } catch (error) {
