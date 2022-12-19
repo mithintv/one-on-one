@@ -1,6 +1,6 @@
-import mongo, { deleteInstallation, fetchInstallation, updateInstallation } from "../lib/mongo.js";
+import mongo, { deleteInstallation, updateInstallation } from "../lib/mongo.js";
 
-import { checkBotMembership, getBotId } from "../functions/bot.js";
+import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel } from "./handlers/eventHandlers.js";
 
 const mention = async ({ client, event, respond }) => {
   try {
@@ -26,69 +26,62 @@ const uninstall = async ({ body }) => {
 const joined = async ({ client, event }) => {
   try {
     console.log(event);
-    // Run function only if joined member is ONO bot
-    const bot_id = await getBotId(client);
+
+    // Get event details, bot id, and members
+    const { channelObj: channel, channel_id, team_id, bot_id, membership, members } = await eventHandler(client, event);
+
+    // Run function if joined member is bot
     if (bot_id === event.user) {
-
-      // Get team_id and channel_id
-      const { team: team_id, channel: channel_id } = event;
-
-      // Get team in DB
-      const team = await fetchInstallation({}, team_id);
-
-      // Check channel existence
-      const channel = team[channel_id];
+      // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
+      channel ? updateDoc = oldChannel(members, channel_id, channel) : updateDoc = newChannel(members, channel_id);
 
-      // Get members of channel
-      const { members } = await checkBotMembership(event, client);
-
-      // If channel doesn't exist, create one with default values
-      if (!channel) {
-
-        // Create channel object to insert into DB
-        const channelObject = members.reduce((acc, curr) => {
-          acc[curr] = {
-            frequency: '14',
-            lastPairing: '',
-            restrict: []
-          };
-          return acc;
-        }, {});
-        channelObject['isActive'] = true;
-
-        // Create doc to insert into DB
-        updateDoc = {
-          $set: {
-            [channel_id]: channelObject
-          },
-        };
-      }
-      // Otherwise, set default values for any new members and keep existing values for all other members
-      else {
-        for (let i = 0; i < members.length; i++) {
-          if (!channel[members[i]]) {
-            channel[members[i]] = {
-              frequency: '14',
-              lastPairing: '',
-              restrict: []
-            };
-          }
-        }
-
-        // Create doc to insert into DB
-        updateDoc = {
-          $set: {
-            [channel_id]: {
-              ...channel,
-              isActive: true
-            }
-          },
-        };
-      }
-      // Save default frequency for each member in channel if channel object doesn't exist or save default frequency for new members in channel if channel object already exists
+      // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
       console.log(result);
+
+      // Send welcome message to slack
+      await client.chat.postMessage({
+        channel: channel_id,
+        text: 'Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in 7 days and further parings will be posted monthly.',
+      });
+
+      // Schedule pairing
+
+      // const currentDate = new Date(Date.now());
+      // console.log(currentDate);
+      // const currentSeconds = currentDate.getSeconds();
+      // console.log(currentSeconds);
+      // currentDate.setSeconds(currentSeconds + 10);
+      // console.log(currentDate);
+      // console.log(currentDate.getTime());
+
+      // // const reminder = await client.reminders.add({
+      // //   text: 'pair',
+      // //   time: Math.floor(currentDate.getTime() / 1000),
+      // // });
+
+      // // console.log(reminder);
+
+      // const schedule = await client.chat.scheduleMessage({
+      //   channel: channel_id,
+      //   post_at: Math.floor(currentDate.getTime() / 1000),
+      //   text: `<@${bot_id}> is creating your one-on-one pairings for this month!`
+      // });
+      // console.log(schedule);
+    }
+
+    // Slack sends member_join events only if bot has joined a channel so by default this block should only run for new members in a channel that bot is already in
+    else if (bot_id !== event.user) {
+      const updateDoc = memberJoins(event.user, channel_id, channel);
+
+      // Save to DB
+      const result = await updateInstallation(team_id, updateDoc);
+      console.log(result);
+    }
+
+    else if (!membership) {
+      console.log('This block should never run');
     }
 
   } catch (error) {
@@ -100,26 +93,12 @@ const left = async ({ client, event }) => {
   try {
     console.log(event);
 
-    // Run function only if joined member is ONO bot
-    const bot_id = await getBotId(client);
-    if (bot_id === event.user) {
+    // Get event details, bot id, and members
+    const { channelObj: channel, channel_id, team_id, user_id, bot_id, membership, members } = await eventHandler(client, event);
 
-      // Get team_id and channel_id
-      const { team: team_id, channel: channel_id } = event;
-
-      // Get team in DB
-      const team = await fetchInstallation({}, team_id);
-      const channel = team[channel_id];
-
+    if (bot_id === user_id) {
       // Create update doc
-      const updateDoc = {
-        $set: {
-          [channel_id]: {
-            ...channel,
-            isActive: false
-          }
-        },
-      };
+      const updateDoc = leaveChannel(channel_id, channel);
 
       // Set is Active to false upon ONO bot being removed from channel
       const workspaces = mongo.db("one-on-one").collection("workspaces");
@@ -128,15 +107,41 @@ const left = async ({ client, event }) => {
 
     }
 
+    // If notified of members leaving channels that bot is not part of, do nothing
+    else if (!membership) {
+      return;
+    }
+
+    // If member leaves a channel bot is in...
+    else {
+      // Fetch user object from DB
+      const user = channel[user_id];
+
+      // Create update doc that sets isActive to false upon a user leaving or being removed from the channel
+      const updateDoc = memberLeaves(user_id, user, channel_id, channel);
+
+      const workspaces = mongo.db("one-on-one").collection("workspaces");
+      const result = await workspaces.updateOne(team, updateDoc);
+      console.log(result);
+    }
+
   } catch (error) {
     console.error(error);
   }
 };
 
+const reminder = async ({ client, event }) => {
+  try {
+    console.log(event);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default function registerEvents(app) {
   app.event('app_uninstalled', uninstall);
   app.event('app_mention', mention);
   app.event('member_joined_channel', joined);
   app.event('member_left_channel', left);
+  app.event('message', reminder);
 }

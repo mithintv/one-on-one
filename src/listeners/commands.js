@@ -46,7 +46,6 @@ const pair = async ({ client, command, ack, respond }) => {
   }
 };
 
-
 const frequency = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
