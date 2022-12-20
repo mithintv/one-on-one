@@ -1,13 +1,3 @@
-
-export async function getBotId(client) {
-  try {
-    const { user_id } = await client.auth.test();
-    return user_id;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export const checkBotMembership = async (action, client) => {
   // Obtain channel id where command was executed
   const { channel_id, channel } = action;
