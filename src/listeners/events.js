@@ -25,13 +25,13 @@ const uninstall = async ({ body }) => {
 const joined = async ({ client, event }) => {
   try {
     // Get event details, bot id, and members
-    const { channelObj: channel, channel_id, team_id, user_id, bot_id, membership, members } = await eventHandler(client, event);
+    const { channelObj: channel, channelMembers, channel_id, team_id, user_id, bot_id, membership, members } = await eventHandler(client, event);
 
     // Run function if joined member is bot
     if (bot_id === user_id) {
       // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
-      channel ? updateDoc = oldChannel(members, channel_id, channel) : updateDoc = newChannel(members, channel_id);
+      channel ? updateDoc = oldChannel(channelMembers, channel_id, channel) : updateDoc = newChannel(channelMembers, channel_id);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
@@ -49,7 +49,7 @@ const joined = async ({ client, event }) => {
       pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
       await client.chat.scheduleMessage({
         channel: channel_id,
-        post_at: Math.floor(pairDate.getTime() / 1000),
+        post_at: Math.ceil(pairDate.getTime() / 1000),
         text: `Here your one-on-one pairings for the upcoming month!`
       });
     }
@@ -115,13 +115,13 @@ const left = async ({ client, event }) => {
 const reminder = async ({ client, event }) => {
   try {
     // Get event details
-    const { channelObj, channel_id, teamObj, team_id, userObj, user_id, bot_id, membership, members } = await eventHandler(client, event);
+    const { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj } = await eventHandler(client, event);
 
     if (membership && bot_id === user_id && event.text === 'Here your one-on-one pairings for the upcoming month!') {
       console.log(`Received pairing request from team ${teamObj.team.name}`);
 
       // Create pairings and post them
-      const pairings = createPairings(members);
+      const pairings = createPairings(channelMembers, membersObj);
       const postResponse = await client.chat.postMessage({
         channel: channel_id,
         text: pairings

@@ -3,8 +3,8 @@ import shuffle from "../../functions/shuffle.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
 
 export default async function eventHandler(client, event) {
-  // Get members of channel
-  const { members, membership, bot_id } = await checkBotMembership(event, client);
+  // Get bot_id and verify bot membership of channel
+  const { bot_id, membership, channelMembers } = await checkBotMembership(event, client);
 
   // Get team_id and channel_id from event
   const { team: team_id, channel: channel_id, user: user_id } = event;
@@ -13,11 +13,12 @@ export default async function eventHandler(client, event) {
   let teamObj = await fetchInstallation({}, team_id);
   if (!teamObj) teamObj = undefined;
 
-  // Check channel and user existence
+  // Check channel, members, and user existence
   const channelObj = teamObj && teamObj[channel_id] ? teamObj[channel_id] : undefined;
-  const userObj = channelObj && channelObj[user_id] ? channelObj[user_id] : undefined;
+  const membersObj = channelObj && channelObj.members ? channelObj.members : undefined;
+  const userObj = channelObj && channelObj.members[user_id] ? channelObj.members[user_id] : undefined;
 
-  return { channelObj, channel_id, teamObj, team_id, userObj, user_id, bot_id, membership, members };
+  return { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj };
 }
 
 
@@ -158,25 +159,31 @@ export const memberLeaves = (user_id, user, channel_id, channel) => {
 };
 
 
-export const createPairings = (members) => {
+export const createPairings = (channelMembers, membersObj) => {
   // Comment below line to create odd pairings
-  members = members.filter(member => member !== 'U04EMKFLADB');
+  // members = members.filter(member => member !== 'U04EMKFLADB');
 
+  for (let i = 0; i < channelMembers.length; i++) {
+    ;
+    if (!membersObj[channelMembers[i]].isActive) {
+      channelMembers = channelMembers.filter(member => member !== channelMembers[i]);
+    }
+  }
   // Shuffle members array
-  members = shuffle(members);
+  channelMembers = shuffle(channelMembers);
 
   // Create output message for pairings
   let pairings = "";
 
   // Even pairings
-  for (let i = 0; i < members.length; i++) {
+  for (let i = 0; i < channelMembers.length; i++) {
     if (i % 2 === 0) {
-      pairings = pairings.concat(`<@${members[i]}>`, ' <-> ');
-    } else pairings = pairings.concat(`<@${members[i]}>`, '\n');
+      pairings = pairings.concat(`<@${channelMembers[i]}>`, ' <-> ');
+    } else pairings = pairings.concat(`<@${channelMembers[i]}>`, '\n');
   }
   // Odd pairings
-  if (members.length % 2 !== 0) {
-    pairings = pairings.concat(`<@${members[0]}>`);
+  if (channelMembers.length % 2 !== 0) {
+    pairings = pairings.concat(`<@${channelMembers[0]}>`);
   }
 
   return pairings;
