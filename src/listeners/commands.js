@@ -1,7 +1,7 @@
-import mongo, { fetchInstallation, updateInstallation } from "../lib/mongo.js";
-import shuffle from "../functions/shuffle.js";
+import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
-import { checkBotMembership } from "../functions/bot.js";
+import { checkBotMembership } from "../functions/slackApi.js";
+import { createPairings } from "./handlers/eventHandlers.js";
 
 const pair = async ({ client, command, ack, respond }) => {
 
@@ -17,28 +17,7 @@ const pair = async ({ client, command, ack, respond }) => {
       return;
     } else {
 
-      // Comment below line to create odd pairings
-      members = members.filter(member => member !== 'U04EMKFLADB');
-
-      // Shuffle members array
-      members = shuffle(members);
-      console.log(members);
-
-      // Create output message for pairings
-      let pairings = "Here are this week's pairings: \n";
-
-      // Even pairings
-      for (let i = 0; i < members.length; i++) {
-        if (i % 2 === 0) {
-          pairings = pairings.concat(`<@${members[i]}>`, ' <-> ');
-        } else pairings = pairings.concat(`<@${members[i]}>`, '\n');
-      }
-      // Odd pairings
-      if (members.length % 2 !== 0) {
-        pairings = pairings.concat(`<@${members[0]}>`);
-      }
-
-      console.log(pairings);
+      const pairings = createPairings(members);
       await respond(pairings);
     }
   } catch (error) {
