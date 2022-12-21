@@ -1,11 +1,7 @@
-export const checkBotMembership = async (action, client) => {
-  // Obtain channel id where command was executed
-  const { channel_id, channel } = action;
-
-
+export const checkBotMembership = async (client, channel_id) => {
   // Get list of members in channel
   let { members: channelMembers } = await client.conversations.members({
-    channel: channel_id || channel
+    channel: channel_id
   });
 
   // Obtain bot id

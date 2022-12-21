@@ -25,28 +25,29 @@ const uninstall = async ({ body }) => {
 const joined = async ({ client, event }) => {
   try {
     // Get event details, bot id, and members
-    const { channelObj: channel, channelMembers, channel_id, team_id, user_id, bot_id, membership, members } = await eventHandler(client, event);
+    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj } = await eventHandler(client, event);
 
     // Run function if joined member is bot
     if (bot_id === user_id) {
       // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
-      channel ? updateDoc = oldChannel(channelMembers, channel_id, channel) : updateDoc = newChannel(channelMembers, channel_id);
+      channelObj ? updateDoc = oldChannel(channelMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, channel_id);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
-      console.log(result);
+      if (result.acknowledged && result.modifiedCount) {
+        console.log(`Succesfully updated DB upon being invited to channel ${channel_id} for team ${teamObj.team.name}`);
+      } else throw new Error(`Error in updating DB upon being invited to channel ${channel_id} for team ${teamObj.team.name}`);
 
       // Send welcome message to slack
-      const welcomeMessage = await client.chat.postMessage({
+      await client.chat.postMessage({
         channel: channel_id,
         text: 'Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in 7 days and further parings will be posted monthly.',
       });
 
-
       // Schedule pairing
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
+      pairDate = new Date(pairDate.setDate(pairDate.getDate() + 1));
       await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),
@@ -56,7 +57,7 @@ const joined = async ({ client, event }) => {
 
     // Slack sends member_join events only if bot has joined a channel so by default this block should only run for new members in a channel that bot is already in
     else if (bot_id !== event.user) {
-      const updateDoc = memberJoins(event.user, channel_id, channel);
+      const updateDoc = memberJoins(event.user, channel_id, channelObj);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
@@ -132,7 +133,7 @@ const reminder = async ({ client, event }) => {
 
       // Create next pairing date
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
+      pairDate = new Date(pairDate.setDate(pairDate.getDate() + 1));
 
       // Create update doc
       channelObj.nextPairDate = pairDate;
@@ -153,7 +154,7 @@ const reminder = async ({ client, event }) => {
       // Schedule next pairing
       const scheduleResponse = await client.chat.scheduleMessage({
         channel: channel_id,
-        post_at: Math.floor(pairDate.getTime() / 1000),
+        post_at: Math.ceil(pairDate.getTime() / 1000),
         text: `Here your one-on-one pairings for this month!`
       });
       if (scheduleResponse) {

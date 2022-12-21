@@ -1,29 +1,29 @@
 import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership } from "../functions/slackApi.js";
-import { createPairings } from "./handlers/eventHandlers.js";
+import commandHandler, { isActive, isInactive } from "./handlers/commandHandlers.js";
 
-const pair = async ({ client, command, ack, respond }) => {
+// const pair = async ({ client, command, ack, respond }) => {
 
-  try {
-    // Acknowledge command request
-    await ack();
+//   try {
+//     // Acknowledge command request
+//     await ack();
 
-    const { bot_id, membership } = await checkBotMembership(command, client);
-    let { members } = await checkBotMembership(command, client);
-    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
-    if (!membership) {
-      await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
-      return;
-    } else {
+//     const { bot_id, membership } = await checkBotMembership(command, client);
+//     let { members } = await checkBotMembership(command, client);
+//     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+//     if (!membership) {
+//       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
+//       return;
+//     } else {
 
-      const pairings = createPairings(members);
-      await respond(pairings);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
+//       const pairings = createPairings(members);
+//       await respond(pairings);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const frequency = async ({ client, command, ack, respond }) => {
   try {
@@ -291,11 +291,69 @@ const unblock = async ({ client, command, ack, respond }) => {
   }
 };
 
+const pair = async ({ client, command, ack, respond }) => {
+  try {
+    // Acknowledge command request
+    await ack();
+
+    // Obtain user, channel_id, team_id and parameters
+    const { team_id, channel_id, user_id, bot_id, membership, teamObj } = await commandHandler(client, command);
+
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/pair can only be called on channels that <@${bot_id}> has joined.`);
+      return;
+    } else {
+      const updateDoc = isActive(teamObj[channel_id], channel_id, user_id);
+      if (updateDoc !== null) {
+        const result = await updateInstallation(team_id, updateDoc);
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Succesfully set ${user_id} in channel ${channel_id} as active for pairing in ${teamObj.team.id}.`);
+          await respond('You have set yourself as active for one-on-one pairings in this channel.');
+        } else throw new Error(`Error setting ${user_id} in channel ${channel_id} as active for one-on-one pairing in ${teamObj.team.id}.`);
+      } else {
+        await respond('You are already set as active to be paired for one-on-ones in this channel.');
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const unpair = async ({ client, command, ack, respond }) => {
+  try {
+    // Acknowledge command request
+    await ack();
+
+    // Obtain user, channel_id, team_id and parameters
+    const { team_id, channel_id, user_id, bot_id, membership, teamObj } = await commandHandler(client, command);
+
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/unpair can only be called on channels that <@${bot_id}> has joined.`);
+      return;
+    } else {
+      const updateDoc = isInactive(teamObj[channel_id], channel_id, user_id);
+      if (updateDoc !== null) {
+        const result = await updateInstallation(team_id, updateDoc);
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Succesfully set ${user_id} in channel ${channel_id} as inactive for pairing in ${teamObj.team.id}.`);
+          await respond('You have set yourself as inactive for one-on-one pairings in this channel.');
+        } else throw new Error(`Error setting ${user_id} in channel ${channel_id} as inactive for one-on-one pairing in ${teamObj.team.id}.`);
+      } else {
+        await respond('You are already set as inactive to be paired for one-on-ones in this channel.');
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 export default function registerCommands(app) {
-
-  app.command('/pair', pair);
   app.command('/frequency', frequency);
   app.command('/block', block);
   app.command('/unblock', unblock);
+  app.command('/pair', pair);
+  app.command('/unpair', unpair);
 }
