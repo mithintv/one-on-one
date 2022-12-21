@@ -291,11 +291,20 @@ const unblock = async ({ client, command, ack, respond }) => {
   }
 };
 
+const active = async ({ client, command, ack, respond }) => {
+
+};
+
+const inactive = async ({ client, command, ack, respond }) => {
+
+};
+
 
 export default function registerCommands(app) {
-
   app.command('/pair', pair);
   app.command('/frequency', frequency);
   app.command('/block', block);
   app.command('/unblock', unblock);
+  app.command('/active', active);
+  app.command('/inactive', inactive);
 }
