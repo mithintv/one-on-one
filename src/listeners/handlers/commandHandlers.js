@@ -21,20 +21,13 @@ export default async function commandHandler(client, command) {
 }
 
 
-export const isActive = (channelObj, membersObj, channel_id, user_id) => {
-  console.log(channelObj);
-  console.log(membersObj);
-  console.log(channel_id);
-  console.log(user_id);
-  if (!membersObj[user_id].isActive) {
-    membersObj[user_id].isActive = true;
+export const isActive = (channelObj, channel_id, user_id) => {
+  if (!channelObj.members[user_id].isActive) {
+    channelObj.members[user_id].isActive = true;
     return {
       $set: {
         [channel_id]: {
           ...channelObj,
-          members: {
-            ...membersObj,
-          }
         }
       }
     };

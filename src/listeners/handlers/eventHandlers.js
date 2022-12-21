@@ -7,7 +7,7 @@ export default async function eventHandler(client, event) {
   const { team: team_id, channel: channel_id, user: user_id } = event;
 
   // Get bot_id and verify bot membership of channel
-  const { bot_id, membership, channelMembers } = await checkBotMembership(event, client);
+  const { bot_id, membership, channelMembers } = await checkBotMembership(client, channel_id);
 
   // Get team in DB
   let teamObj = await fetchInstallation({}, team_id);

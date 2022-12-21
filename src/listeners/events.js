@@ -25,7 +25,7 @@ const uninstall = async ({ body }) => {
 const joined = async ({ client, event }) => {
   try {
     // Get event details, bot id, and members
-    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, channelObj } = await eventHandler(client, event);
+    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj } = await eventHandler(client, event);
 
     // Run function if joined member is bot
     if (bot_id === user_id) {

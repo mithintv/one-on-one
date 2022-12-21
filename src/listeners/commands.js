@@ -1,7 +1,7 @@
 import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership } from "../functions/slackApi.js";
-import commandHandler from "./handlers/commandHandlers.js";
+import commandHandler, { isActive } from "./handlers/commandHandlers.js";
 
 // const pair = async ({ client, command, ack, respond }) => {
 
@@ -297,20 +297,20 @@ const pair = async ({ client, command, ack, respond }) => {
     await ack();
 
     // Obtain user, channel_id, team_id and parameters
-    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj } = await commandHandler(client, command);
+    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj, userObj } = await commandHandler(client, command);
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
-      const updateDoc = await isActive(channelObj, membersObj, channel_id, user_id);
+      const updateDoc = isActive(channelObj, channel_id, user_id);
       if (updateDoc !== null) {
         const result = await updateInstallation(team_id, updateDoc);
         if (result.acknowledged && result.modifiedCount) {
-          console.log(`Succesfully set user in channel ${channel_id} as active for pairing in team ${teamObj.team.name}`);
+          console.log(`Succesfully set ${user_id} in channel ${channel_id} as active for pairing in ${teamObj.team.id}.`);
           await respond('You have set yourself as active for one-on-one pairings in this channel.');
-        } else throw new Error(`Error setting user in channel ${channel_id} as active for one-on-one pairing in team ${teamObj.team.name}.`);
+        } else throw new Error(`Error setting ${user_id} in channel ${channel_id} as active for one-on-one pairing in ${teamObj.team.id}.`);
       } else {
         await respond('You are already set as active to be paired for one-on-ones in this channel.');
       }
