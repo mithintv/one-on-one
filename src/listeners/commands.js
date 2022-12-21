@@ -1,29 +1,7 @@
 import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership } from "../functions/slackApi.js";
-import commandHandler, { setFrequency, isActive, isInactive } from "./handlers/commandHandlers.js";
-
-// const pair = async ({ client, command, ack, respond }) => {
-
-//   try {
-//     // Acknowledge command request
-//     await ack();
-
-//     const { bot_id, membership } = await checkBotMembership(command, client);
-//     let { members } = await checkBotMembership(command, client);
-//     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
-//     if (!membership) {
-//       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
-//       return;
-//     } else {
-
-//       const pairings = createPairings(members);
-//       await respond(pairings);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
+import commandHandler, { setFrequency, setBlock, isActive, isInactive } from "./handlers/commandHandlers.js";
 
 const frequency = async ({ client, command, ack, respond }) => {
   try {
@@ -58,91 +36,33 @@ const frequency = async ({ client, command, ack, respond }) => {
 
 const block = async ({ client, command, ack, respond }) => {
   try {
-    console.log(command);
 
     // Acknowledge command request
     await ack();
+    console.log(command);
 
     // Obtain user, channel_id, team_id and parameters
-    const { user_id, channel_id, team_id, text } = command;
-
-    // Check if bot is in the channel
-    const { bot_id, members, membership } = await checkBotMembership(command, client);
+    const { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, channelObj } = await commandHandler(client, command);
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
       await respond(`/block can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
+      // Get all users list w/ usernames
+      const { members: allMembers } = await client.users.list();
 
-      // Fetch installtion
-      let team = await fetchInstallation({}, team_id);
-      // If no parameters are set, output current restrictions
-      let block = team[channel_id][user_id].restrict;
-      if (!text && block.length === 0) {
-        await respond("You are currenlt being paired with everyone on this channel for one-on-one's with no restrictions.");
-      }
-      else if (!text) {
-        let response = "You are currently not being paired with the following members in this channel for one-on-one's:\n";
-        console.log(block);
-        block.forEach(element => {
-          response = response + `<@${element}>\n`;
-        });
-        await respond(response);
-      } else {
-        // Check if passed in members are members of the channel
-        const splitParams = text.replaceAll("@", "").split(" ");
+      // Block command logic
+      const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, allMembers, channelMembers);
 
-        // Get users list
-        const { members } = await client.users.list();
-
-        // Create object with keys corresponding to names and values corresponding to user_ids
-        const memberNames = {};
-        for (let i = 0; i < members.length; i++) {
-          if (!memberNames[members[i].name]) {
-            memberNames[members[i].name] = members[i].id;
-          }
-        }
-        console.log(memberNames);
-
-        // Loop through params and replace user names with user_ids
-        for (let i = 0; i < splitParams.length; i++) {
-          if (memberNames[splitParams[i]]) {
-            splitParams[i] = memberNames[splitParams[i]];
-          };
-        }
-        console.log(splitParams);
-
-        // Create a document that sets the restrict key of a specific user on a specific channel
-        const channel = team[channel_id];
-        const user = channel[user_id];
-        splitParams.forEach(element => {
-          user.restrict.push(element);
-        });
-        const updateDoc = {
-          $set: {
-            [channel_id]: {
-              ...channel,
-              [user_id]: {
-                ...user,
-                restrict: user.restrict
-              },
-            }
-          },
-        };
+      if (updateDoc !== null) {
         const result = await updateInstallation(team_id, updateDoc);
-        console.log(result);
-        // Fetch updated installtion and updated restrictions
-        team = await fetchInstallation({}, team_id);
-        block = team[channel_id][user_id].restrict;
-        let response = "You are currently not being paired with the following members in this channel:\n";
-        block.forEach(element => {
-          response = response + `<@${element}>\n`;
-        });
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Successfully set restrictions for ${user_id} in ${channel_id} for ${team_id}.`);
+        } else throw new Error(`Error setting restrictions for ${user_id} in ${channel_id} for ${team_id}.`);
         await respond(response);
-      }
+      } else await respond(response);
     }
-
   } catch (error) {
     console.error(error);
   }
