@@ -3,27 +3,27 @@ import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 import { checkBotMembership } from "../functions/slackApi.js";
 import { createPairings } from "./handlers/eventHandlers.js";
 
-const pair = async ({ client, command, ack, respond }) => {
+// const pair = async ({ client, command, ack, respond }) => {
 
-  try {
-    // Acknowledge command request
-    await ack();
+//   try {
+//     // Acknowledge command request
+//     await ack();
 
-    const { bot_id, membership } = await checkBotMembership(command, client);
-    let { members } = await checkBotMembership(command, client);
-    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
-    if (!membership) {
-      await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
-      return;
-    } else {
+//     const { bot_id, membership } = await checkBotMembership(command, client);
+//     let { members } = await checkBotMembership(command, client);
+//     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+//     if (!membership) {
+//       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
+//       return;
+//     } else {
 
-      const pairings = createPairings(members);
-      await respond(pairings);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
+//       const pairings = createPairings(members);
+//       await respond(pairings);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const frequency = async ({ client, command, ack, respond }) => {
   try {
@@ -291,11 +291,30 @@ const unblock = async ({ client, command, ack, respond }) => {
   }
 };
 
-const active = async ({ client, command, ack, respond }) => {
+const pair = async ({ client, command, ack, respond }) => {
+  try {
+    console.log(command);
 
+    // Acknowledge command request
+    await ack();
+
+    // Obtain user, channel_id, team_id and parameters
+    const { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj } = await commandHandler(client, command);
+
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
+      return;
+    } else {
+
+    }
+
+  } catch (error) {
+
+  }
 };
 
-const inactive = async ({ client, command, ack, respond }) => {
+const unpair = async ({ client, command, ack, respond }) => {
 
 };
 
@@ -305,6 +324,6 @@ export default function registerCommands(app) {
   app.command('/frequency', frequency);
   app.command('/block', block);
   app.command('/unblock', unblock);
-  app.command('/active', active);
-  app.command('/inactive', inactive);
+  app.command('/pair', pair);
+  app.command('/unpair', unpair);
 }

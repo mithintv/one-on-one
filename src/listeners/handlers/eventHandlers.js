@@ -3,11 +3,11 @@ import shuffle from "../../functions/shuffle.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
 
 export default async function eventHandler(client, event) {
-  // Get bot_id and verify bot membership of channel
-  const { bot_id, membership, channelMembers } = await checkBotMembership(event, client);
-
   // Get team_id and channel_id from event
   const { team: team_id, channel: channel_id, user: user_id } = event;
+
+  // Get bot_id and verify bot membership of channel
+  const { bot_id, membership, channelMembers } = await checkBotMembership(event, client);
 
   // Get team in DB
   let teamObj = await fetchInstallation({}, team_id);
@@ -18,7 +18,7 @@ export default async function eventHandler(client, event) {
   const membersObj = channelObj && channelObj.members ? channelObj.members : undefined;
   const userObj = channelObj && channelObj.members[user_id] ? channelObj.members[user_id] : undefined;
 
-  return { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj };
+  return { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj, };
 }
 
 
