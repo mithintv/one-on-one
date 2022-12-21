@@ -1,7 +1,7 @@
 import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership } from "../functions/slackApi.js";
-import { createPairings } from "./handlers/eventHandlers.js";
+import commandHandler from "./handlers/commandHandlers.js";
 
 // const pair = async ({ client, command, ack, respond }) => {
 
@@ -293,8 +293,6 @@ const unblock = async ({ client, command, ack, respond }) => {
 
 const pair = async ({ client, command, ack, respond }) => {
   try {
-    console.log(command);
-
     // Acknowledge command request
     await ack();
 
@@ -306,11 +304,19 @@ const pair = async ({ client, command, ack, respond }) => {
       await respond(`/pair can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
-
+      const updateDoc = await isActive(channelObj, membersObj, channel_id, user_id);
+      if (updateDoc !== null) {
+        const result = await updateInstallation(team_id, updateDoc);
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Succesfully set user in channel ${channel_id} as active for pairing in team ${teamObj.team.name}`);
+          await respond('You have set yourself as active for one-on-one pairings in this channel.');
+        } else throw new Error(`Error setting user in channel ${channel_id} as active for one-on-one pairing in team ${teamObj.team.name}.`);
+      } else {
+        await respond('You are already set as active to be paired for one-on-ones in this channel.');
+      }
     }
-
   } catch (error) {
-
+    console.error(error);
   }
 };
 
@@ -320,7 +326,6 @@ const unpair = async ({ client, command, ack, respond }) => {
 
 
 export default function registerCommands(app) {
-  app.command('/pair', pair);
   app.command('/frequency', frequency);
   app.command('/block', block);
   app.command('/unblock', unblock);

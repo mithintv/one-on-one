@@ -6,7 +6,7 @@ export default async function commandHandler(client, command) {
   const { team_id, channel_id, user_id } = command;
 
   // Get bot_id and verify bot membership of channel
-  const { bot_id, membership, channelMembers } = await checkBotMembership(command, client);
+  const { bot_id, membership, channelMembers } = await checkBotMembership(client, channel_id);
 
   // Get team in DB
   let teamObj = await fetchInstallation({}, team_id);
@@ -19,3 +19,24 @@ export default async function commandHandler(client, command) {
 
   return { team_id, channel_id, user_id, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj };
 }
+
+
+export const isActive = (channelObj, membersObj, channel_id, user_id) => {
+  console.log(channelObj);
+  console.log(membersObj);
+  console.log(channel_id);
+  console.log(user_id);
+  if (!membersObj[user_id].isActive) {
+    membersObj[user_id].isActive = true;
+    return {
+      $set: {
+        [channel_id]: {
+          ...channelObj,
+          members: {
+            ...membersObj,
+          }
+        }
+      }
+    };
+  } else return null;
+};
