@@ -33,3 +33,17 @@ export const isActive = (channelObj, channel_id, user_id) => {
     };
   } else return null;
 };
+
+
+export const isInactive = (channelObj, channel_id, user_id) => {
+  if (channelObj.members[user_id].isActive) {
+    channelObj.members[user_id].isActive = false;
+    return {
+      $set: {
+        [channel_id]: {
+          ...channelObj,
+        }
+      }
+    };
+  } else return null;
+};
