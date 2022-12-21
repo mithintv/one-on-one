@@ -1,7 +1,7 @@
 import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
 
 import { checkBotMembership } from "../functions/slackApi.js";
-import commandHandler, { isActive, isInactive } from "./handlers/commandHandlers.js";
+import commandHandler, { setFrequency, isActive, isInactive } from "./handlers/commandHandlers.js";
 
 // const pair = async ({ client, command, ack, respond }) => {
 
@@ -29,49 +29,26 @@ const frequency = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
     await ack();
-    console.log(command);
-    // Obtain user and channel_id
-    const { user_id, channel_id, team_id, text } = command;
 
-    // Check if bot is in the channel
-    const { bot_id, members, membership } = await checkBotMembership(command, client);
+    // Obtain user, channel_id, team_id and parameters
+    const { team_id, channel_id, user_id, params, bot_id, membership, channelObj } = await commandHandler(client, command);
 
-    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    // If bot is not in channel, respond with failure, else set frequency
     if (!membership) {
       await respond(`/frequency can only be called on channels that <@${bot_id}> has joined`);
-      return;
     } else {
 
-      // Fetch installtion
-      const team = await fetchInstallation({}, team_id);
-      // If no parameters are set, output current frequency
-      const frequency = team[channel_id][user_id].frequency;
-      if (!text) {
-        await respond(`Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
-      }
-      // If a parameter is passed and is a valid number from 1 to 365, set it as new frequency
-      else if (text && parseInt(text) !== NaN && parseInt(text) >= 1 && parseInt(text) <= 90) {
-        const channel = team[channel_id];
-        const user = channel[user_id];
-        // Create a document that sets the frequency of specific user
-        const updateDoc = {
-          $set: {
-            [channel_id]: {
-              ...channel,
-              [user_id]: {
-                ...user,
-                frequency: text
-              },
-            }
-          },
-        };
+      // Set frequency of particular user if params are within bounds
+      const updateDoc = setFrequency(channelObj, channel_id, user_id, params);
+
+      // Save to DB and respond
+      if (typeof updateDoc === 'object') {
         const result = await updateInstallation(team_id, updateDoc);
-        console.log(result);
-        await respond(`Your new frequency of one-on-one's in this channel is every ${text} days.`);
-      }
-      else {
-        await respond(`You inputted an invalid value for frequency of one-on-one's. Only numeric values from 1 to 90 are accepted. Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
-      }
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${params} days`);
+          await respond(`Your new frequency of one-on-one's in this channel is every ${params} days.`);
+        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${params} days`);
+      } else await respond(updateDoc);
     }
   }
   catch (error) {
