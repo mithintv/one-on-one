@@ -1,5 +1,6 @@
 import { fetchInstallation } from "../../lib/mongo.js";
 import shuffle from "../../functions/shuffle.js";
+import { filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/filter.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
 
 export default async function eventHandler(client, event) {
@@ -159,48 +160,27 @@ export const memberLeaves = (user_id, user, channel_id, channel) => {
 };
 
 
-export const createPairings = (channelMembers, membersObj) => {
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (!membersObj[channelMembers[i]].isActive) {
-      channelMembers = channelMembers.filter(member => member !== channelMembers[i]);
-    }
-  }
-  // Shuffle members array
-  channelMembers = shuffle(channelMembers);
+export const createPairings = async (channelMembers, membersObj) => {
+  // Check for active status
+  const activeMembers = filterActive(channelMembers, membersObj);
+  console.log(activeMembers);
 
-  // Even pairings
-  if (channelMembers.length % 2 !== 0) {
-    channelMembers.push(channelMembers[0]);
-  }
+  // Check for frequency congruence
+  const readyMembers = filterFrequency(activeMembers, membersObj);
+  console.log(readyMembers);
 
+  // Shuffle members array and compensate for odd length
+  const shuffledMembers = shuffle(readyMembers);
+  if (shuffledMembers.length % 2 !== 0) {
+    shuffledMembers.push(shuffledMembers[0]);
+  }
+  console.log(shuffledMembers);
   // Check for restrictions
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (channelMembers[i] === channelMembers[i + 1]) {
-      channelMembers = shuffle(channelMembers);
-      i = 0;
-      console.log(channelMembers);
-    }
-    if (membersObj[channelMembers[i]].restrict.length !== 0 && i % 2 === 0 && membersObj[channelMembers[i]].restrict.includes(channelMembers[i + 1])) {
-      channelMembers = shuffle(channelMembers);
-      i = 0;
-      console.log(channelMembers);
-    }
-    else if (membersObj[channelMembers[i]].restrict.length !== 0 && i % 2 !== 0 && membersObj[channelMembers[i]].restrict.includes(channelMembers[i - 1])) {
-      channelMembers = shuffle(channelMembers);
-      i = 0;
-      console.log(channelMembers);
-    }
-  }
+  const filteredMembers = await filterRestriction(shuffledMembers, membersObj);
 
   // Create output message for pairings
-  let pairings = "";
+  const pairings = stringifyPairings(filteredMembers);
 
-  // Create string from pairings
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (i % 2 === 0) {
-      pairings = pairings.concat(`<@${channelMembers[i]}>`, ' <-> ');
-    } else pairings = pairings.concat(`<@${channelMembers[i]}>`, '\n');
-  }
-
-  return pairings;
+  console.log(filteredMembers, pairings);
+  return { filteredMembers, pairings };
 };

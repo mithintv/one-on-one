@@ -126,7 +126,8 @@ const reminder = async ({ client, event }) => {
       console.log(`Received pairing request from team ${teamObj.team.id}`);
 
       // Create pairings and post them
-      const pairings = createPairings(channelMembers, membersObj);
+      const { filteredMembers, pairings } = await createPairings(channelMembers, membersObj);
+      console.log(pairings);
       const postResponse = await client.chat.postMessage({
         channel: channel_id,
         text: pairings
@@ -137,9 +138,15 @@ const reminder = async ({ client, event }) => {
 
       // Create next pairing date
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
+      pairDate = new Date(pairDate.setMinutes(pairDate.getMinutes() + 2));
 
       // Create update doc
+      for (let i = 0; i < filteredMembers.length; i++) {
+        if (channelObj.members[filteredMembers[i]]) {
+          channelObj.members[filteredMembers[i]].lastPairing = pairDate;
+        }
+      }
+
       channelObj.nextPairDate = pairDate;
       const updateDoc = {
         $set: {
