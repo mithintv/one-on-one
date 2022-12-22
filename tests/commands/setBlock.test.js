@@ -140,7 +140,7 @@ test('/block command fired with w/ invalid params for active user w/ restriction
           },
         }
       }
-    }, response: "You are currently not being paired with the following members in this channel for one-on-one's:\n<@U04EPTE4TU3>\nThe following members are not in this channel and were ignored for this command:\n<@U04EHD34KGW>\n"
+    }, response: "You are currently not being paired with the following members in this channel for one-on-one's:\n<@U04EPTE4TU3>\nThe following members are not in this channel and were ignored for the /block command:\n<@U04EHD34KGW>\n"
   });
 });
 
@@ -172,6 +172,6 @@ test('/block command fired with w/ invalid params for active user w/o restrictio
           },
         }
       }
-    }, response: "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\nThe following members are not in this channel and were ignored for this command:\n<@U04EHD34KGW>\n"
+    }, response: "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\nThe following members are not in this channel and were ignored for the /block command:\n<@U04EHD34KGW>\n"
   });
 });

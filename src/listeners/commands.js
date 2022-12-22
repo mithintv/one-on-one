@@ -1,6 +1,4 @@
-import { fetchInstallation, updateInstallation } from "../lib/mongo.js";
-
-import { checkBotMembership } from "../functions/slackApi.js";
+import { updateInstallation } from "../lib/mongo.js";
 import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
 
 const frequency = async ({ client, command, ack, respond }) => {
@@ -74,7 +72,7 @@ const unblock = async ({ client, command, ack, respond }) => {
     await ack();
 
     // Obtain user, channel_id, team_id and parameters
-    const { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, channelObj } = await commandHandler(client, command);
+    const { team_id, channel_id, user_id, params, bot_id, membership, channelObj, channelMembers } = await commandHandler(client, command);
 
     // If bot is not in channel, respond with failure, else use unblock logic
     if (!membership) {
