@@ -39,7 +39,6 @@ export const receiver = new ExpressReceiver({
         const result = await saveInstallation(installation);
         if (result.insertedId) {
           console.log(`A new workspace named ${installation.team.name} was installed with the id: ${result.insertedId} `);
-          return;
         }
       }
 

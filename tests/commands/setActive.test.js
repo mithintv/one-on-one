@@ -1,4 +1,4 @@
-import commandHandler, { isActive, isInactive } from "../src/listeners/handlers/commandHandlers.js";
+import { isActive, isInactive } from "../../src/listeners/handlers/commandHandlers";
 
 test('/pair command fired for inactive user', () => {
   expect(isActive({
