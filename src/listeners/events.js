@@ -14,7 +14,7 @@ const uninstall = async ({ body }) => {
   try {
     const { query, result } = await deleteInstallation(body.team_id);
     if (result.acknowledged && result.deletedCount === 1) {
-      console.log(`Succesfully uninstalled and deleted tokens for ${query.team.name} with id: ${query._id}`);
+      console.log(`Succesfully uninstalled and deleted tokens for ${query.team.id} with id: ${query._id}`);
     }
   }
   catch (error) {
@@ -47,11 +47,11 @@ const joined = async ({ client, event }) => {
 
       // Schedule pairing
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setDate(pairDate.getDate() + 1));
+      pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
       await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),
-        text: `Here your one-on-one pairings for the upcoming month!`
+        text: `Here are your one-on-one pairings for the upcoming month!`
       });
     }
 
@@ -61,7 +61,9 @@ const joined = async ({ client, event }) => {
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
-      console.log(result);
+      if (result.acknowledged && result.modifiedCount) {
+        console.log(`Successfully added ${user_id} for pairings in ${channel_id} in ${team_id}`);
+      } else throw new Error(`Error adding ${user_id} for pairings in ${channel_id} in ${team_id}`);
     }
 
     else if (!membership) {
@@ -75,8 +77,6 @@ const joined = async ({ client, event }) => {
 
 const left = async ({ client, event }) => {
   try {
-    console.log(event);
-
     // Get event details, bot id, and members
     const { channelObj: channel, channel_id, team_id, user_id, bot_id, membership } = await eventHandler(client, event);
 
@@ -86,7 +86,9 @@ const left = async ({ client, event }) => {
 
       // Set is Active to false upon bot being removed from channel
       const result = await updateInstallation(team_id, updateDoc);
-      console.log(result);
+      if (result.acknowledged && result.modifiedCount) {
+        console.log(`Successfully set bot as inactive on ${channel_id} in ${team_id}`);
+      } else throw new Error(`Error setting bot as inactive on ${channel_id} in ${team_id}`);
     }
 
     // If notified of members leaving channels that bot is not part of, do nothing
@@ -105,7 +107,9 @@ const left = async ({ client, event }) => {
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
-      console.log(result);
+      if (result.acknowledged && result.modifiedCount) {
+        console.log(`Successfully set ${user_id} as inactive on ${channel_id} in ${team_id}`);
+      } else throw new Error(`Error setting ${user_id} as inactive on ${channel_id} in ${team_id}`);
     }
 
   } catch (error) {
@@ -118,8 +122,8 @@ const reminder = async ({ client, event }) => {
     // Get event details
     const { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj } = await eventHandler(client, event);
 
-    if (membership && bot_id === user_id && event.text === 'Here your one-on-one pairings for the upcoming month!') {
-      console.log(`Received pairing request from team ${teamObj.team.name}`);
+    if (membership && bot_id === user_id && event.text === 'Here are your one-on-one pairings for the upcoming month!') {
+      console.log(`Received pairing request from team ${teamObj.team.id}`);
 
       // Create pairings and post them
       const pairings = createPairings(channelMembers, membersObj);
@@ -128,12 +132,12 @@ const reminder = async ({ client, event }) => {
         text: pairings
       });
       if (postResponse) {
-        console.log(`Succesfully completed pairing request for team ${teamObj.team.name} in channel ${channel_id}`);
-      } else throw new Error(`Error completed pairing request for team ${teamObj.team.name} in channel ${channel_id}`);
+        console.log(`Succesfully completed pairing request for team ${teamObj.team.id} in channel ${channel_id}`);
+      } else throw new Error(`Error completed pairing request for team ${teamObj.team.id} in channel ${channel_id}`);
 
       // Create next pairing date
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setDate(pairDate.getDate() + 1));
+      pairDate = new Date(pairDate.setSeconds(pairDate.getSeconds() + 10));
 
       // Create update doc
       channelObj.nextPairDate = pairDate;
@@ -148,18 +152,18 @@ const reminder = async ({ client, event }) => {
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
       if (result.acknowledged && result.modifiedCount) {
-        console.log(`Succesfully updated DB for next pairing date for team ${teamObj.team.name} in channel ${channel_id}`);
-      } else throw new Error(`Error in updating DB for next pairing for team ${teamObj.team.name} in channel ${channel_id}`);
+        console.log(`Succesfully updated DB for next pairing date for team ${teamObj.team.id} in channel ${channel_id}`);
+      } else throw new Error(`Error in updating DB for next pairing for team ${teamObj.team.id} in channel ${channel_id}`);
 
       // Schedule next pairing
       const scheduleResponse = await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),
-        text: `Here your one-on-one pairings for this month!`
+        text: `Here are your one-on-one pairings for the upcoming month!`
       });
       if (scheduleResponse) {
-        console.log(`Succesfully scheduled message for next pairing date for team ${teamObj.team.name} in channel ${channel_id}`);
-      } else throw new Error(`Error in scheduling message for next pairing for team ${teamObj.team.name} in channel ${channel_id}`);
+        console.log(`Succesfully scheduled message for next pairing date for team ${teamObj.team.id} in channel ${channel_id}`);
+      } else throw new Error(`Error in scheduling message for next pairing for team ${teamObj.team.id} in channel ${channel_id}`);
     }
   } catch (error) {
     console.error(error);

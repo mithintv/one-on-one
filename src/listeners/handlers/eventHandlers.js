@@ -160,11 +160,7 @@ export const memberLeaves = (user_id, user, channel_id, channel) => {
 
 
 export const createPairings = (channelMembers, membersObj) => {
-  // Comment below line to create odd pairings
-  // members = members.filter(member => member !== 'U04EMKFLADB');
-
   for (let i = 0; i < channelMembers.length; i++) {
-    ;
     if (!membersObj[channelMembers[i]].isActive) {
       channelMembers = channelMembers.filter(member => member !== channelMembers[i]);
     }
@@ -172,18 +168,38 @@ export const createPairings = (channelMembers, membersObj) => {
   // Shuffle members array
   channelMembers = shuffle(channelMembers);
 
+  // Even pairings
+  if (channelMembers.length % 2 !== 0) {
+    channelMembers.push(channelMembers[0]);
+  }
+
+  // Check for restrictions
+  for (let i = 0; i < channelMembers.length; i++) {
+    if (channelMembers[i] === channelMembers[i + 1]) {
+      channelMembers = shuffle(channelMembers);
+      i = 0;
+      console.log(channelMembers);
+    }
+    if (membersObj[channelMembers[i]].restrict.length !== 0 && i % 2 === 0 && membersObj[channelMembers[i]].restrict.includes(channelMembers[i + 1])) {
+      channelMembers = shuffle(channelMembers);
+      i = 0;
+      console.log(channelMembers);
+    }
+    else if (membersObj[channelMembers[i]].restrict.length !== 0 && i % 2 !== 0 && membersObj[channelMembers[i]].restrict.includes(channelMembers[i - 1])) {
+      channelMembers = shuffle(channelMembers);
+      i = 0;
+      console.log(channelMembers);
+    }
+  }
+
   // Create output message for pairings
   let pairings = "";
 
-  // Even pairings
+  // Create string from pairings
   for (let i = 0; i < channelMembers.length; i++) {
     if (i % 2 === 0) {
       pairings = pairings.concat(`<@${channelMembers[i]}>`, ' <-> ');
     } else pairings = pairings.concat(`<@${channelMembers[i]}>`, '\n');
-  }
-  // Odd pairings
-  if (channelMembers.length % 2 !== 0) {
-    pairings = pairings.concat(`<@${channelMembers[0]}>`);
   }
 
   return pairings;
