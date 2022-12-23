@@ -11,20 +11,17 @@ export const filterActive = (channelMembers, membersObj) => {
 };
 
 export const filterFrequency = (activeMembers, membersObj) => {
+  const currentDate = new Date();
   let readyMembers = [];
   for (let i = 0; i < activeMembers.length; i++) {
-    if (membersObj[activeMembers[i]].lastPairing !== '') {
-      const currentDate = new Date();
-      const lastPairDate = new Date(membersObj[activeMembers[i]].lastPairing);
-      const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersObj[activeMembers[i]].frequency)));
-      console.log(currentDate.getTime(), nextPairDate.getTime());
-      if (currentDate.getTime() < nextPairDate.getTime()) {
-        readyMembers = activeMembers.filter(member => member !== activeMembers[i]);
-        activeMembers = readyMembers;
-      } else readyMembers = activeMembers;
-    }
+    const lastPairDate = new Date(membersObj[activeMembers[i]].lastPairing.toISOString());
+    const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersObj[activeMembers[i]].frequency)));
+    console.log(currentDate, nextPairDate);
+    if (currentDate.getTime() > nextPairDate.getTime()) {
+      readyMembers.push(activeMembers[i]);
+    };
   }
-  return readyMembers;
+  return { readyMembers, currentDate };
 };
 
 export const filterRestriction = async (readyMembers, membersObj) => {

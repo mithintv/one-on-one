@@ -33,11 +33,13 @@ export const installDate = () => {
 
 
 export const newChannel = (members, channel_id) => {
+  const date = new Date();
+
   // Create channel object to insert into DB
   const membersObj = members.reduce((acc, curr) => {
     acc[curr] = {
       frequency: '14',
-      lastPairing: '',
+      lastPairing: new Date(date.setDate(date.getDate() - 28)),
       restrict: [],
       isActive: true,
     };
@@ -64,13 +66,13 @@ export const newChannel = (members, channel_id) => {
 
 
 export const oldChannel = (members, channel_id, channel) => {
-
+  const date = new Date();
   // Set default frequencies for any new members
   for (let i = 0; i < members.length; i++) {
     if (!channel.members[members[i]]) {
       channel.members[members[i]] = {
         frequency: '14',
-        lastPairing: '',
+        lastPairing: new Date(date.setDate(date.getDate() - 28)),
         isActive: true,
         restrict: []
       };
@@ -121,6 +123,8 @@ export const leaveChannel = (channel_id, channel) => {
 
 
 export const memberJoins = (user_id, channel_id, channel) => {
+  const date = new Date();
+
   // Create doc to insert into DB
   return {
     $set: {
@@ -130,7 +134,7 @@ export const memberJoins = (user_id, channel_id, channel) => {
           ...channel.members,
           [user_id]: {
             frequency: '14',
-            lastPairing: '',
+            lastPairing: new Date(date.setDate(date.getDate() - 28)),
             restrict: [],
             isActive: true,
           }
@@ -166,7 +170,7 @@ export const createPairings = async (channelMembers, membersObj) => {
   console.log(activeMembers);
 
   // Check for frequency congruence
-  const readyMembers = filterFrequency(activeMembers, membersObj);
+  const { readyMembers, currentDate } = filterFrequency(activeMembers, membersObj);
   console.log(readyMembers);
 
   // Shuffle members array and compensate for odd length
@@ -181,6 +185,6 @@ export const createPairings = async (channelMembers, membersObj) => {
   // Create output message for pairings
   const pairings = stringifyPairings(filteredMembers);
 
-  console.log(filteredMembers, pairings);
-  return { filteredMembers, pairings };
+  console.log(filteredMembers);
+  return { filteredMembers, pairings, currentDate };
 };
