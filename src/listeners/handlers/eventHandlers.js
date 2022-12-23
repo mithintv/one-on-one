@@ -167,24 +167,21 @@ export const memberLeaves = (user_id, user, channel_id, channel) => {
 export const createPairings = async (channelMembers, membersObj) => {
   // Check for active status
   const activeMembers = filterActive(channelMembers, membersObj);
-  console.log(activeMembers);
 
   // Check for frequency congruence
   const { readyMembers, currentDate } = filterFrequency(activeMembers, membersObj);
-  console.log(readyMembers);
 
   // Shuffle members array and compensate for odd length
   const shuffledMembers = shuffle(readyMembers);
   if (shuffledMembers.length % 2 !== 0) {
     shuffledMembers.push(shuffledMembers[0]);
   }
-  console.log(shuffledMembers);
+
   // Check for restrictions
   const filteredMembers = await filterRestriction(shuffledMembers, membersObj);
 
   // Create output message for pairings
   const pairings = stringifyPairings(filteredMembers);
 
-  console.log(filteredMembers);
   return { filteredMembers, pairings, currentDate };
 };

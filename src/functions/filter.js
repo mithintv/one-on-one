@@ -16,7 +16,6 @@ export const filterFrequency = (activeMembers, membersObj) => {
   for (let i = 0; i < activeMembers.length; i++) {
     const lastPairDate = new Date(membersObj[activeMembers[i]].lastPairing.toISOString());
     const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersObj[activeMembers[i]].frequency)));
-    console.log(currentDate, nextPairDate);
     if (currentDate.getTime() > nextPairDate.getTime()) {
       readyMembers.push(activeMembers[i]);
     };

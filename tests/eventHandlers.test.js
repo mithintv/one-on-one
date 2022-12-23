@@ -1,7 +1,4 @@
-import { jest } from '@jest/globals';
 import { leaveChannel, newChannel, memberJoins, oldChannel, memberLeaves, installDate } from "../src/listeners/handlers/eventHandlers.js";
-
-jest.useFakeTimers();
 
 const { currentDate, nextPairDate } = installDate();
 
