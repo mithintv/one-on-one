@@ -1,6 +1,8 @@
 import { leaveChannel, newChannel, memberJoins, oldChannel, memberLeaves, installDate } from "../src/listeners/handlers/eventHandlers.js";
 
 const { currentDate, nextPairDate } = installDate();
+const { currentDate: memberPairDate } = installDate();
+memberPairDate.setDate(memberPairDate.getDate() - 28);
 
 test('Bot joins new channel', () => {
   expect(newChannel([
@@ -17,37 +19,37 @@ test('Bot joins new channel', () => {
           members: {
             U04DE8L08R5: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
             U04DRTFB6QM: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
             U04EHD34KGW: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
             U04EMKFLADB: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
             U04EPTE4TU3: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
             U04ESESV56G: {
               frequency: "14",
-              lastPairing: "",
+              lastPairing: memberPairDate,
               isActive: true,
               restrict: []
             },
@@ -71,31 +73,31 @@ test('Bot joins previously joined channel', () => {
     members: {
       U04DE8L08R5: {
         frequency: "14",
-        lastPairing: "",
+        lastPairing: new Date('2022-12-20T15:44:39.390Z'),
         isActive: true,
         restrict: []
       },
       U04DRTFB6QM: {
         frequency: "14",
-        lastPairing: "",
+        lastPairing: new Date('2022-12-20T15:44:39.390Z'),
         isActive: true,
         restrict: []
       },
       U04EHD34KGW: {
         frequency: "14",
-        lastPairing: "",
+        lastPairing: new Date('2022-12-20T15:44:39.390Z'),
         isActive: true,
         restrict: []
       },
       U04EMKFLADB: {
         frequency: "14",
-        lastPairing: "",
+        lastPairing: new Date('2022-12-20T15:44:39.390Z'),
         isActive: true,
         restrict: []
       },
       U04EPTE4TU3: {
         frequency: "14",
-        lastPairing: "",
+        lastPairing: new Date('2022-12-20T15:44:39.390Z'),
         isActive: true,
         restrict: []
       },
@@ -109,37 +111,37 @@ test('Bot joins previously joined channel', () => {
         members: {
           U04DE8L08R5: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04DRTFB6QM: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EHD34KGW: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EMKFLADB: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EPTE4TU3: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": false,
             "restrict": []
           },
           U04ESESV56G: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": memberPairDate,
             "isActive": true,
             "restrict": []
           },
@@ -255,31 +257,31 @@ test('Member joins channel that bot has joined', () => {
       members: {
         U04DE8L08R5: {
           frequency: "14",
-          lastPairing: "",
+          lastPairing: new Date('2022-12-20T15:44:39.390Z'),
           isActive: true,
           restrict: []
         },
         U04DRTFB6QM: {
           frequency: "14",
-          lastPairing: "",
+          lastPairing: new Date('2022-12-20T15:44:39.390Z'),
           isActive: true,
           restrict: []
         },
         U04EHD34KGW: {
           frequency: "14",
-          lastPairing: "",
+          lastPairing: new Date('2022-12-20T15:44:39.390Z'),
           isActive: true,
           restrict: []
         },
         U04EMKFLADB: {
           frequency: "14",
-          lastPairing: "",
+          lastPairing: new Date('2022-12-20T15:44:39.390Z'),
           isActive: true,
           restrict: []
         },
         U04EPTE4TU3: {
           frequency: "14",
-          lastPairing: "",
+          lastPairing: new Date('2022-12-20T15:44:39.390Z'),
           isActive: true,
           restrict: []
         },
@@ -294,37 +296,37 @@ test('Member joins channel that bot has joined', () => {
         members: {
           U04DE8L08R5: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04DRTFB6QM: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EHD34KGW: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EMKFLADB: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04EPTE4TU3: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": new Date('2022-12-20T15:44:39.390Z'),
             "isActive": true,
             "restrict": []
           },
           U04ESESV56G: {
             "frequency": "14",
-            "lastPairing": "",
+            "lastPairing": memberPairDate,
             "isActive": true,
             "restrict": []
           },

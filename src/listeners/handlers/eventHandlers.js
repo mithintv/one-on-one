@@ -34,12 +34,12 @@ export const installDate = () => {
 
 export const newChannel = (members, channel_id) => {
   const date = new Date();
-
+  const lastPairing = new Date(date.setDate(date.getDate() - 28));
   // Create channel object to insert into DB
   const membersObj = members.reduce((acc, curr) => {
     acc[curr] = {
       frequency: '14',
-      lastPairing: new Date(date.setDate(date.getDate() - 28)),
+      lastPairing: lastPairing,
       restrict: [],
       isActive: true,
     };

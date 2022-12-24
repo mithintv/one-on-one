@@ -41,7 +41,6 @@ export const filterRestriction = async (readyMembers, membersObj) => {
   return readyMembers;
 };
 
-
 export const stringifyPairings = (filteredMembers) => {
   let pairings = '';
   for (let i = 0; i < filteredMembers.length; i++) {
