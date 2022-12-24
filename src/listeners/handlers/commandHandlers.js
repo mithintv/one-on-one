@@ -248,6 +248,7 @@ export const setUnblock = (channelObj, channel_id, user_id, params, allMembers, 
   }
 };
 
+
 export const isActive = (channelObj, channel_id, user_id) => {
   if (!channelObj.members[user_id].isActive) {
     channelObj.members[user_id].isActive = true;

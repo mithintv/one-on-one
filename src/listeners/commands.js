@@ -66,8 +66,6 @@ const block = async ({ client, command, ack, respond }) => {
 
 const unblock = async ({ client, command, ack, respond }) => {
   try {
-    console.log(command);
-
     // Acknowledge command request
     await ack();
 

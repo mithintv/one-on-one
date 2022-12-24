@@ -1,5 +1,6 @@
 import { fetchInstallation } from "../../lib/mongo.js";
 import shuffle from "../../functions/shuffle.js";
+import { filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/filter.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
 
 export default async function eventHandler(client, event) {
@@ -32,11 +33,13 @@ export const installDate = () => {
 
 
 export const newChannel = (members, channel_id) => {
+  const date = new Date();
+  const lastPairing = new Date(date.setDate(date.getDate() - 28));
   // Create channel object to insert into DB
   const membersObj = members.reduce((acc, curr) => {
     acc[curr] = {
       frequency: '14',
-      lastPairing: '',
+      lastPairing: lastPairing,
       restrict: [],
       isActive: true,
     };
@@ -63,13 +66,13 @@ export const newChannel = (members, channel_id) => {
 
 
 export const oldChannel = (members, channel_id, channel) => {
-
+  const date = new Date();
   // Set default frequencies for any new members
   for (let i = 0; i < members.length; i++) {
     if (!channel.members[members[i]]) {
       channel.members[members[i]] = {
         frequency: '14',
-        lastPairing: '',
+        lastPairing: new Date(date.setDate(date.getDate() - 28)),
         isActive: true,
         restrict: []
       };
@@ -120,6 +123,8 @@ export const leaveChannel = (channel_id, channel) => {
 
 
 export const memberJoins = (user_id, channel_id, channel) => {
+  const date = new Date();
+
   // Create doc to insert into DB
   return {
     $set: {
@@ -129,7 +134,7 @@ export const memberJoins = (user_id, channel_id, channel) => {
           ...channel.members,
           [user_id]: {
             frequency: '14',
-            lastPairing: '',
+            lastPairing: new Date(date.setDate(date.getDate() - 28)),
             restrict: [],
             isActive: true,
           }
@@ -159,32 +164,24 @@ export const memberLeaves = (user_id, user, channel_id, channel) => {
 };
 
 
-export const createPairings = (channelMembers, membersObj) => {
-  // Comment below line to create odd pairings
-  // members = members.filter(member => member !== 'U04EMKFLADB');
+export const createPairings = async (channelMembers, membersObj) => {
+  // Check for active status
+  const activeMembers = filterActive(channelMembers, membersObj);
 
-  for (let i = 0; i < channelMembers.length; i++) {
-    ;
-    if (!membersObj[channelMembers[i]].isActive) {
-      channelMembers = channelMembers.filter(member => member !== channelMembers[i]);
-    }
+  // Check for frequency congruence
+  const { readyMembers, currentDate } = filterFrequency(activeMembers, membersObj);
+
+  // Shuffle members array and compensate for odd length
+  const shuffledMembers = shuffle(readyMembers);
+  if (shuffledMembers.length % 2 !== 0) {
+    shuffledMembers.push(shuffledMembers[0]);
   }
-  // Shuffle members array
-  channelMembers = shuffle(channelMembers);
+
+  // Check for restrictions
+  const filteredMembers = await filterRestriction(shuffledMembers, membersObj);
 
   // Create output message for pairings
-  let pairings = "";
+  const pairings = stringifyPairings(filteredMembers);
 
-  // Even pairings
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (i % 2 === 0) {
-      pairings = pairings.concat(`<@${channelMembers[i]}>`, ' <-> ');
-    } else pairings = pairings.concat(`<@${channelMembers[i]}>`, '\n');
-  }
-  // Odd pairings
-  if (channelMembers.length % 2 !== 0) {
-    pairings = pairings.concat(`<@${channelMembers[0]}>`);
-  }
-
-  return pairings;
+  return { filteredMembers, pairings, currentDate };
 };
