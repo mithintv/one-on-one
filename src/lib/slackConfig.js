@@ -1,13 +1,7 @@
 import "dotenv/config";
-// import axios from 'axios';
 
 import pkg from "@slack/bolt";
 import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
-
-// custom routes
-import slack from "../routes/slack.js";
-
-// import { WebClient, LogLevel } from "@slack/web-api";
 
 const { App, ExpressReceiver, LogLevel } = pkg;
 
@@ -74,9 +68,6 @@ export const receiver = new ExpressReceiver({
     }
   },
 });
-
-// group custom routes
-receiver.app.use('/slack', slack);
 
 const app = new App({
   receiver,
