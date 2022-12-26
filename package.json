@@ -4,10 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "local": "node app.js",
-    "build": "rm -rf dist && webpack --mode development",
-    "start": "node ./dist/server.js",
+    "build": "rm -rf dist && webpack --watch",
+    "start": "nodemon ./dist/server.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "Mithin Thomas",

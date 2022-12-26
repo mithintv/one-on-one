@@ -1,4 +1,4 @@
-import shuffle from "./shuffle.js";
+import shuffle from "./shuffle.mjs";
 
 export const filterActive = (channelMembers, membersObj) => {
   const activeMembers = [];

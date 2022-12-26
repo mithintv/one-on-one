@@ -3,20 +3,21 @@ const nodeExternals = require('webpack-node-externals');
 // const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 module.exports = {
+  mode: 'development',
   entry: {
     server: './app.js',
   },
   output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/',
+    path: path.resolve(__dirname, 'dist'),
+    // publicPath: '/',
     filename: '[name].js'
   },
   target: 'node',
-  node: {
-    // Need this when working with express, otherwise the build fails
-    __dirname: false,   // if you don't put this is, __dirname
-    __filename: false,  // and __filename return blank or /
-  },
+  // node: {
+  //   // Need this when working with express, otherwise the build fails
+  //   __dirname: false,   // if you don't put this is, __dirname
+  //   __filename: false,  // and __filename return blank or /
+  // },
   externals: [nodeExternals()], // Need this to avoid error when working with Express
   module: {
     rules: [
@@ -46,10 +47,8 @@ module.exports = {
   experiments: {
     topLevelAwait: true
   },
-  mode: 'development',
   devServer: {
-    compress: true,
     port: 3080,
-    static: false,
+    static: './dist'
   },
 };

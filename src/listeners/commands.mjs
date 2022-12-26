@@ -1,5 +1,5 @@
-import { updateInstallation } from "../lib/mongo.js";
-import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
+import { updateInstallation } from "../lib/mongo.mjs";
+import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.mjs";
 
 const frequency = async ({ client, command, ack, respond }) => {
   try {

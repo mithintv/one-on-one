@@ -1,5 +1,5 @@
-import { fetchInstallation, updateInstallation } from "../../lib/mongo.js";
-import { checkBotMembership } from "../../functions/slackApi.js";
+import { fetchInstallation, updateInstallation } from "../../lib/mongo.mjs";
+import { checkBotMembership } from "../../functions/slackApi.mjs";
 
 export default async function commandHandler(client, command) {
   // Get team_id and channel_id from command

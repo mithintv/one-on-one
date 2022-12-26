@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import pkg from "@slack/bolt";
-import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
+import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.mjs";
 
 const { App, ExpressReceiver, LogLevel } = pkg;
 
