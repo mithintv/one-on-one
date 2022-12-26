@@ -1,5 +1,6 @@
 import { deleteInstallation, updateInstallation } from "../lib/mongo";
 import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings } from "./handlers/eventHandlers";
+import { setTime, getTime, interval } from "../lib/constants";
 
 const mention = async ({ client, event, respond }) => {
   try {
@@ -36,8 +37,8 @@ const joined = async ({ client, event }) => {
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
       if (result.acknowledged && result.modifiedCount) {
-        console.log(`Successfully updated DB upon being invited to ${channel_id} for team ${teamObj.team.id}`);
-      } else throw new Error(`Error updating DB upon being invited to channel ${channel_id} for team ${teamObj.team.id}`);
+        console.log(`Successfully updated ${teamObj.team.id} upon being invited to ${channel_id} `);
+      } else throw new Error(`Error updating ${teamObj.team.id} upon being invited to ${channel_id}`);
 
       // Send welcome message to slack
       await client.chat.postMessage({
@@ -47,7 +48,7 @@ const joined = async ({ client, event }) => {
 
       // Schedule pairing
       let pairDate = new Date();
-      pairDate = new Date(pairDate.setMinutes(pairDate.getMinutes() + parseInt(process.env.INTERVAL)));
+      pairDate = new Date(pairDate[setTime](pairDate[getTime]() + parseInt(interval)));
       const scheduleResponse = await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),
@@ -126,7 +127,7 @@ const reminder = async ({ client, event }) => {
     const { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj } = await eventHandler(client, event);
 
     if (membership && bot_id === user_id && event.text === 'Generating your one-on-one pairings~') {
-      console.log(`Received pairing request from team ${teamObj.team.id}`);
+      console.log(`Received pairing request from ${teamObj.team.id}`);
 
       // Create pairings and post them
       const { filteredMembers, pairings, currentDate } = await createPairings(channelMembers, membersObj);
@@ -142,8 +143,8 @@ const reminder = async ({ client, event }) => {
           text: pairings
         });
         if (postResponse.ok) {
-          console.log(`Successfully completed pairing request for team ${teamObj.team.id} in channel ${channel_id}`);
-        } else throw new Error(`Error completing pairing request for team ${teamObj.team.id} in channel ${channel_id}`);
+          console.log(`Successfully completed pairing request for ${teamObj.team.id} in ${channel_id}`);
+        } else throw new Error(`Error completing pairing request for ${teamObj.team.id} in ${channel_id}`);
 
         // Update members' last pairing date
         for (let i = 0; i < filteredMembers.length; i++) {
@@ -155,7 +156,7 @@ const reminder = async ({ client, event }) => {
 
       // Create next pairing date and create update doc
       const nextPairDate = new Date();
-      channelObj.nextPairDate = new Date(nextPairDate.setMinutes(nextPairDate.getMinutes() + parseInt(process.env.INTERVAL)));
+      channelObj.nextPairDate = new Date(nextPairDate[setTime](nextPairDate[getTime]() + parseInt(interval)));
       const updateDoc = {
         $set: {
           [channel_id]: {
@@ -167,8 +168,8 @@ const reminder = async ({ client, event }) => {
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
       if (result.acknowledged && result.modifiedCount) {
-        console.log(`Successfully updated DB for next pairing date for team ${teamObj.team.id} in channel ${channel_id}`);
-      } else throw new Error(`Error in updating DB for next pairing for team ${teamObj.team.id} in channel ${channel_id}`);
+        console.log(`Successfully updated DB for next pairing date for ${teamObj.team.id} in ${channel_id}`);
+      } else throw new Error(`Error in updating DB for next pairing for ${teamObj.team.id} in ${channel_id}`);
 
       // Schedule next pairing
       const scheduleResponse = await client.chat.scheduleMessage({
@@ -177,8 +178,8 @@ const reminder = async ({ client, event }) => {
         text: `Generating your one-on-one pairings~`
       });
       if (scheduleResponse.ok) {
-        console.log(`Successfully scheduled message for next pairing date for team ${teamObj.team.id} in channel ${channel_id}`);
-      } else throw new Error(`Error in scheduling message for next pairing for team ${teamObj.team.id} in channel ${channel_id}`);
+        console.log(`Successfully scheduled message for next pairing date for ${teamObj.team.id} in ${channel_id}`);
+      } else throw new Error(`Error in scheduling message for next pairing for ${teamObj.team.id} in ${channel_id}`);
     }
   } catch (error) {
     console.error(error);

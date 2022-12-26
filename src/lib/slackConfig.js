@@ -32,10 +32,7 @@ export const receiver = new ExpressReceiver({
         if (result.insertedId) {
           console.log(`A new workspace named ${installation.team.name} was installed with the id: ${result.insertedId} `);
         }
-      }
-
-
-      throw new Error('Failed saving installation data to installationStore');
+      } else throw new Error('Failed saving installation data to installationStore');
     },
     fetchInstallation: async (installQuery) => {
       // Bolt will pass your handler an installQuery object
@@ -47,9 +44,7 @@ export const receiver = new ExpressReceiver({
       if (installQuery.teamId !== undefined) {
         // single team app installation lookup
         return await fetchInstallation(installQuery);
-      }
-
-      throw new Error('Failed fetching installation');
+      } else throw new Error('Failed fetching installation');
     },
     deleteInstallation: async (installQuery) => {
       // Bolt will pass your handler  an installQuery object
@@ -61,8 +56,7 @@ export const receiver = new ExpressReceiver({
       if (installQuery.teamId !== undefined) {
         // single team app installation deletion
         return await deleteInstallation(installQuery.teamId);
-      }
-      throw new Error('Failed to delete installation');
+      } else throw new Error('Failed to delete installation');
     }
   },
 });
