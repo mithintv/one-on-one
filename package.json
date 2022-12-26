@@ -8,7 +8,7 @@
     "clean": "rm -rf dist && webpack --config webpack.dev.js",
     "build": "webpack --config webpack.dev.js -w",
     "start": "nodemon ./dist/server.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "jest"
   },
   "author": "Mithin Thomas",
   "license": "ISC",

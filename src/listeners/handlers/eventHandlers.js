@@ -1,6 +1,5 @@
 import { fetchInstallation } from "../../lib/mongo";
-import shuffle from "../../functions/shuffle";
-import { filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/filter";
+import { shuffle, filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/pairing";
 import { checkBotMembership } from "../../functions/slackApi";
 
 export default async function eventHandler(client, event) {
