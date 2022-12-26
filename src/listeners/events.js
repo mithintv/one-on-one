@@ -84,6 +84,27 @@ const left = async ({ client, event }) => {
     const { channelObj: channel, channel_id, team_id, user_id, bot_id, membership } = await eventHandler(client, event);
 
     if (bot_id === user_id) {
+      // Find scheduled messages
+      const { scheduled_messages } = await client.chat.scheduledMessages.list({
+        channel: channel_id
+      });
+
+      // Filter scheduled messages
+      const filteredMessages = scheduled_messages.filter(message => message.text === 'Generating your one-on-one pairings~');
+
+      // Delete scheduled messages
+      if (filteredMessages.length > 0) {
+        for (let i = 0; i < filteredMessages.length; i++) {
+          const response = await client.chat.deleteScheduledMessage({
+            channel: channel_id,
+            scheduled_message_id: filteredMessages[i].id
+          });
+          if (response.ok) {
+            console.log(`Successfully deleted scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+          } else throw new Error(`Error deleting scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+        }
+      }
+
       // Create update doc
       const updateDoc = leaveChannel(channel_id, channel);
 
