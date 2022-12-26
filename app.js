@@ -1,7 +1,7 @@
-import mongo from "./src/lib/mongo.mjs";
-import app from "./src/lib/slackConfig.mjs";
+import app from "./src/lib/slackConfig";
+import mongo from "./src/lib/mongo";
 // slack listeners
-import registerListeners from "./src/listeners/index.mjs";
+import registerListeners from "./src/listeners/index";
 
 await mongo.connect();
 console.log('Successfully connected to database');

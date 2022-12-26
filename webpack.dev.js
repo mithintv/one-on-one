@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 // const HtmlWebPackPlugin = require("html-webpack-plugin");
@@ -12,12 +13,15 @@ module.exports = {
     // publicPath: '/',
     filename: '[name].js'
   },
+  resolve: {
+    extensions: ['.js']
+  },
   target: 'node',
-  // node: {
-  //   // Need this when working with express, otherwise the build fails
-  //   __dirname: false,   // if you don't put this is, __dirname
-  //   __filename: false,  // and __filename return blank or /
-  // },
+  node: {
+    // Need this when working with express, otherwise the build fails
+    __dirname: false,   // if you don't put this is, __dirname
+    __filename: false,  // and __filename return blank or /
+  },
   externals: [nodeExternals()], // Need this to avoid error when working with Express
   module: {
     rules: [
@@ -38,6 +42,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.HotModuleReplacementPlugin()
     // new HtmlWebPackPlugin({
     //   template: "./index.html",
     //   filename: "./index.html",

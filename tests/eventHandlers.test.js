@@ -1,4 +1,4 @@
-import { leaveChannel, newChannel, memberJoins, oldChannel, memberLeaves, installDate } from "../src/listeners/handlers/eventHandlers.mjs";
+import { leaveChannel, newChannel, memberJoins, oldChannel, memberLeaves, installDate } from "../src/listeners/handlers/eventHandlers";
 
 const { currentDate, nextPairDate } = installDate();
 const { currentDate: memberPairDate } = installDate();

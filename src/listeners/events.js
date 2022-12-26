@@ -1,5 +1,5 @@
-import { deleteInstallation, updateInstallation } from "../lib/mongo.mjs";
-import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings } from "./handlers/eventHandlers.mjs";
+import { deleteInstallation, updateInstallation } from "../lib/mongo";
+import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings } from "./handlers/eventHandlers";
 
 const mention = async ({ client, event, respond }) => {
   try {
