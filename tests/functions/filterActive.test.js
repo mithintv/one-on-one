@@ -1,4 +1,4 @@
-import { filterActive } from "../../src/functions/filter";
+import { filterActive } from "../../src/functions/pairing";
 
 test('filterActive w/ only active users', () => {
   expect(filterActive([

@@ -1,4 +1,4 @@
-import { filterFrequency } from "../../src/functions/filter";
+import { filterFrequency } from "../../src/functions/pairing";
 
 test('filterFrequency w/ valid dates', () => {
   expect(filterFrequency([

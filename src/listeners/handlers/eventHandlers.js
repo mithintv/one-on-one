@@ -1,7 +1,7 @@
-import { fetchInstallation } from "../../lib/mongo.js";
-import shuffle from "../../functions/shuffle.js";
-import { filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/filter.js";
-import { checkBotMembership } from "../../functions/slackApi.js";
+import { fetchInstallation } from "../../lib/mongo";
+import { shuffle, filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/pairing";
+import { checkBotMembership } from "../../functions/slackApi";
+import { setTime, getTime, interval } from "../../lib/constants";
 
 export default async function eventHandler(client, event) {
   // Get team_id and channel_id from event
@@ -26,7 +26,7 @@ export default async function eventHandler(client, event) {
 export const installDate = () => {
   const currentDate = new Date();
   const nextPairDate = new Date();
-  nextPairDate.setDate(nextPairDate.getDate() + 7);
+  nextPairDate[setTime](nextPairDate[getTime]() + interval);
 
   return { currentDate, nextPairDate };
 };

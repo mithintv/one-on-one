@@ -1,5 +1,5 @@
-import registerCommands from "./commands.js";
-import registerEvents from "./events.js";
+import registerCommands from "./commands";
+import registerEvents from "./events";
 
 export default function registerListeners(app) {
   registerCommands(app);

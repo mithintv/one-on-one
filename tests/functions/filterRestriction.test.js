@@ -1,4 +1,4 @@
-import { filterRestriction } from "../../src/functions/filter";
+import { filterRestriction } from "../../src/functions/pairing";
 
 test('filterRestriction w/ no restrictions', async () => {
   await expect(filterRestriction([

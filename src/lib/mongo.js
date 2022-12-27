@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "production") {
   uri = 'mongodb://localhost:27017/one-on-one';
 }
 
-const mongo = new MongoClient(uri);
+export const mongo = new MongoClient(uri);
 
 export async function saveInstallation(installation) {
   await mongo.connect();
