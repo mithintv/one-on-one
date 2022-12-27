@@ -4,11 +4,12 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "npm-run-all -p build:w start",
-    "clean": "rm -rf dist && webpack --config webpack.dev.js --env development",
+    "dev": "npm-run-all -p build:w start:w",
+    "clean": "rm -rf dist && webpack --config webpack.dev.js",
     "build:w": "webpack --config webpack.dev.js -w",
     "build": "webpack --config webpack.dev.js -w",
-    "start": "nodemon ./dist/server.js",
+    "start:w": "nodemon ./dist/server.js",
+    "start": "node ./dist/server.js",
     "test": "jest"
   },
   "author": "Mithin Thomas",
