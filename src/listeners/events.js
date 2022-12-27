@@ -29,6 +29,51 @@ const joined = async ({ client, event }) => {
 
     // Run function if joined member is bot
     if (bot_id === user_id) {
+
+      // Delete messages sent by bot in dev mode
+      if (process.env.NODE_ENV === 'development') {
+        const { messages } = await client.conversations.history({
+          channel: channel_id
+        });
+
+        // Filter messages sent by bot
+        const botMessages = messages.filter(message => message.user === bot_id && message.subtype !== 'channel_join');
+
+        // Delete filtered messages
+        if (botMessages.length > 0) {
+          for (let i = 0; i < botMessages.length; i++) {
+            const response = await client.chat.delete({
+              channel: channel_id,
+              ts: botMessages[i].ts
+            });
+            if (response.ok) {
+              console.log(`Successfully deleted bot message with ts: ${botMessages[i].ts} in ${channel_id} for ${team_id}`);
+            } else throw new Error(`Error deleting bot message with id: ${botMessages[i].ts} in ${channel_id} for ${team_id}`);
+          }
+        }
+      }
+
+      // Find scheduled messages
+      const { scheduled_messages } = await client.chat.scheduledMessages.list({
+        channel: channel_id
+      });
+
+      // Filter scheduled messages
+      const filteredMessages = scheduled_messages.filter(message => message.text === 'Generating your one-on-one pairings~');
+
+      // Delete scheduled messages
+      if (filteredMessages.length > 0) {
+        for (let i = 0; i < filteredMessages.length; i++) {
+          const response = await client.chat.deleteScheduledMessage({
+            channel: channel_id,
+            scheduled_message_id: filteredMessages[i].id
+          });
+          if (response.ok) {
+            console.log(`Successfully deleted scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+          } else throw new Error(`Error deleting scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+        }
+      }
+
       // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
       channelObj ? updateDoc = oldChannel(channelMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, channel_id);
@@ -84,6 +129,28 @@ const left = async ({ client, event }) => {
     const { channelObj: channel, channel_id, team_id, user_id, bot_id, membership } = await eventHandler(client, event);
 
     if (bot_id === user_id) {
+
+      // Find scheduled messages
+      const { scheduled_messages } = await client.chat.scheduledMessages.list({
+        channel: channel_id
+      });
+
+      // Filter scheduled messages
+      const filteredMessages = scheduled_messages.filter(message => message.text === 'Generating your one-on-one pairings~');
+
+      // Delete scheduled messages
+      if (filteredMessages.length > 0) {
+        for (let i = 0; i < filteredMessages.length; i++) {
+          const response = await client.chat.deleteScheduledMessage({
+            channel: channel_id,
+            scheduled_message_id: filteredMessages[i].id
+          });
+          if (response.ok) {
+            console.log(`Successfully deleted scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+          } else throw new Error(`Error deleting scheduled message with id: ${filteredMessages[i].id} in ${channel_id} for ${team_id}`);
+        }
+      }
+
       // Create update doc
       const updateDoc = leaveChannel(channel_id, channel);
 
