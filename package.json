@@ -4,10 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "npm-run-all -p build start",
+    "dev": "npm-run-all -p build:w start:w",
     "clean": "rm -rf dist && webpack --config webpack.dev.js --env development",
     "build:w": "webpack --config webpack.dev.js -w",
-    "build": "webpack --config webpack.dev.js -w",
+    "build": "webpack --config webpack.dev.js",
     "start:w": "nodemon ./dist/server.js",
     "start": "node ./dist/server.js",
     "test": "jest"
