@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "npm-run-all -p build start",
     "clean": "rm -rf dist && webpack --config webpack.dev.js --env development",
-    "build": "webpack --config webpack.dev.js --env development -w",
-    "start": "nodemon ./dist/server.js",
+    "build:w": "webpack --config webpack.dev.js -w",
+    "build": "webpack --config webpack.dev.js -w",
+    "start:w": "nodemon ./dist/server.js",
+    "start": "node ./dist/server.js",
     "test": "jest"
   },
   "author": "Mithin Thomas",
