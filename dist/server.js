@@ -46,7 +46,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"getTime\": () => (/* binding */ getTime),\n/* harmony export */   \"interval\": () => (/* binding */ interval),\n/* harmony export */   \"setTime\": () => (/* binding */ setTime)\n/* harmony export */ });\nvar setTime, getTime, interval;\nif (true) {\n  setTime = 'setMinutes';\n  getTime = 'getMinutes';\n  interval = 15;\n} else {}\n\n\n//# sourceURL=webpack://one-on-one/./src/lib/constants.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"getTime\": () => (/* binding */ getTime),\n/* harmony export */   \"interval\": () => (/* binding */ interval),\n/* harmony export */   \"setTime\": () => (/* binding */ setTime)\n/* harmony export */ });\nvar setTime, getTime, interval;\n\n// if (process.env.NODE_ENV === 'development') {\n//   setTime = 'setMinutes';\n//   getTime = 'getMinutes';\n//   interval = 15;\n// } else {\nsetTime = 'setDate';\ngetTime = 'getDate';\ninterval = 28;\n// }\n\n\n\n//# sourceURL=webpack://one-on-one/./src/lib/constants.js?");
 
 /***/ }),
 
@@ -304,7 +304,7 @@ module.exports = require("mongodb");
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("52405489fa8fdae3d03d")
+/******/ 		__webpack_require__.h = () => ("ef543d577fca3ae7e7ef")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
