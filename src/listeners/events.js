@@ -93,7 +93,7 @@ const joined = async ({ client, event }) => {
 
       // Schedule pairing
       let pairDate = new Date();
-      pairDate = new Date(pairDate[setTime](pairDate[getTime]() + parseInt(interval)));
+      pairDate = new Date(pairDate[setTime](pairDate[getTime]() + 7));
       const scheduleResponse = await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),
