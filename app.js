@@ -10,6 +10,6 @@ console.log('Successfully connected to database');
 registerListeners(app);
 
 (async () => {
-  await app.start(3080);
+  await app.start(process.env.PORT || 3080);
   console.log('Express app is running');
 })();
