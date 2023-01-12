@@ -26,9 +26,11 @@ export default async function eventHandler(client, event) {
 export const installDate = () => {
   const currentDate = new Date();
   const nextPairDate = new Date();
+  const firstPairDate = new Date();
   nextPairDate[setTime](nextPairDate[getTime]() + interval);
+  firstPairDate[setTime](nextPairDate[getTime]() + 7);
 
-  return { currentDate, nextPairDate };
+  return { currentDate, nextPairDate, firstPairDate };
 };
 
 
@@ -46,10 +48,10 @@ export const newChannel = (members, channel_id) => {
     return acc;
   }, {});
   const channelObj = {};
-  const { currentDate, nextPairDate } = installDate();
+  const { currentDate, firstPairDate } = installDate();
   channelObj.isActive = true;
   channelObj.installDate = currentDate;
-  channelObj.nextPairDate = nextPairDate;
+  channelObj.nextPairDate = firstPairDate;
 
   // Create doc to insert into DB
   const updateDoc = {
