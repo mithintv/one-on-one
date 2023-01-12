@@ -7,7 +7,7 @@ import { MongoClient } from "mongodb";
  */
 let uri = `mongodb+srv://admin:${process.env.PASSWORD}@${process.env.CLUSTER}.mongodb.net/?retryWrites=true&w=majority`;
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV === "development") {
   uri = 'mongodb://localhost:27017/one-on-one';
   console.log('Connecting to local database...');
 }
