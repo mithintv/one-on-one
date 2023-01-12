@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const Dotenv = require('dotenv-webpack');
+const NodemonPlugin = require('nodemon-webpack-plugin');
 // const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 module.exports = {
@@ -44,6 +45,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new NodemonPlugin()
     // new Dotenv({
     //   path: `./.env`
     // })

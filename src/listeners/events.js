@@ -2,9 +2,9 @@ import { deleteInstallation, updateInstallation } from "../lib/mongo";
 import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings } from "./handlers/eventHandlers";
 import { setTime, getTime, interval } from "../lib/constants";
 
-const mention = async ({ client, event, respond }) => {
+const mention = async ({ client, event }) => {
   try {
-    console.log(event);
+    // console.log(event);
   }
   catch (error) {
     console.error(error);
