@@ -1,6 +1,6 @@
 import { leaveChannel, newChannel, memberJoins, oldChannel, memberLeaves, installDate } from "../src/listeners/handlers/eventHandlers";
 
-const { currentDate, nextPairDate } = installDate();
+const { currentDate, nextPairDate, firstPairDate } = installDate();
 const { currentDate: memberPairDate } = installDate();
 memberPairDate.setDate(memberPairDate.getDate() - 28);
 
@@ -56,7 +56,7 @@ test('Bot joins new channel', () => {
           },
           isActive: true,
           installDate: currentDate,
-          nextPairDate: nextPairDate
+          nextPairDate: firstPairDate
         }
       },
     });

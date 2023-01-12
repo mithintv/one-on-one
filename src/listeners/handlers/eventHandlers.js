@@ -1,7 +1,7 @@
-import { fetchInstallation } from "../../lib/mongo";
-import { shuffle, filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/pairing";
-import { checkBotMembership } from "../../functions/slackApi";
-import { setTime, getTime, interval } from "../../lib/constants";
+import { fetchInstallation } from "../../lib/mongo.js";
+import { shuffle, filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/pairing.js";
+import { checkBotMembership } from "../../functions/slackApi.js";
+import { setTime, getTime, interval } from "../../lib/constants.js";
 
 export default async function eventHandler(client, event) {
   // Get team_id and channel_id from event
