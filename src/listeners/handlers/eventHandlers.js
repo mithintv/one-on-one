@@ -34,12 +34,16 @@ export const installDate = () => {
 };
 
 
-export const newChannel = (members, channel_id) => {
+export const newChannel = (channelMembers, allMembers, channel_id) => {
   const date = new Date();
   const lastPairing = new Date(date.setDate(date.getDate() - 28));
+
   // Create channel object to insert into DB
-  const membersObj = members.reduce((acc, curr) => {
+  const membersObj = channelMembers.reduce((acc, curr) => {
+    const member = allMembers.find(member =>
+      member.id === curr);
     acc[curr] = {
+      name: member.real_name,
       frequency: '14',
       lastPairing: lastPairing,
       restrict: [],
@@ -67,12 +71,15 @@ export const newChannel = (members, channel_id) => {
 };
 
 
-export const oldChannel = (members, channel_id, channel) => {
+export const oldChannel = (channelMembers, allMembers, channel_id, channel) => {
   const date = new Date();
   // Set default frequencies for any new members
-  for (let i = 0; i < members.length; i++) {
-    if (!channel.members[members[i]]) {
-      channel.members[members[i]] = {
+  for (let i = 0; i < channelMembers.length; i++) {
+    const member = allMembers.find(member =>
+      member.id === channelMembers[i]);
+    if (!channel.members[channelMembers[i]]) {
+      channel.members[channelMembers[i]] = {
+        name: member.real_name,
         frequency: '14',
         lastPairing: new Date(date.setDate(date.getDate() - 28)),
         isActive: true,
@@ -83,7 +90,7 @@ export const oldChannel = (members, channel_id, channel) => {
 
   // Set isActive to false for any members who have since left the channel
   for (const member in channel.members) {
-    if (!members.includes(member)) {
+    if (!channelMembers.includes(member)) {
       channel.members[member] = {
         ...channel.members[member],
         isActive: false

@@ -31,6 +31,8 @@ const joined = async ({ client, event }) => {
     // Run function if joined member is bot
     if (bot_id === user_id) {
 
+      const { members: allMembers } = await client.users.list();
+
       // Delete messages sent by bot in dev mode
       if (process.env.NODE_ENV === 'development') {
         const { messages } = await client.conversations.history({
@@ -77,7 +79,7 @@ const joined = async ({ client, event }) => {
 
       // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
-      channelObj ? updateDoc = oldChannel(channelMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, channel_id);
+      channelObj ? updateDoc = oldChannel(channelMembers, allMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, allMembers, channel_id);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
