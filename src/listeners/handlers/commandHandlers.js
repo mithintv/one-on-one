@@ -76,7 +76,7 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
   // If parameters are set, begin block logic
   else {
     // Create array from passed in usernames
-    const splitParams = params.replaceAll("@", "").split(" ");
+    const splitParams = params.replace(/@/g, "").split(" ");
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};
