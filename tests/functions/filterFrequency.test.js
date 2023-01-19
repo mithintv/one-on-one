@@ -67,7 +67,6 @@ test('#2 filterFrequency w/ invalid dates', () => {
     'U04DRTFB6QM',
     'U04EPTE4TU3',
     'U04ESESV56G',
-    'U04FDNKH2L8'
   ],
     [
       {
@@ -121,7 +120,6 @@ test('#3 filterFrequency w/ mixed dates', () => {
     'U04DRTFB6QM',
     'U04EPTE4TU3',
     'U04ESESV56G',
-    'U04FDNKH2L8'
   ],
     [
       {
