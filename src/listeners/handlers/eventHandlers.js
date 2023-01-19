@@ -203,7 +203,7 @@ export const createPairings = async (channelMembers, membersObj) => {
   }
 
   // Check for restrictions
-  const filteredMembers = await filterRestriction(shuffledMembers, membersObj);
+  const filteredMembers = filterRestriction(shuffledMembers, membersObj);
 
   // Create output message for pairings
   const pairings = stringifyPairings(filteredMembers);

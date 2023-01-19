@@ -50,7 +50,7 @@ test('#1 filterRestriction w/ no restrictions', () => {
       },
     ],
   ))
-    .resolves.toStrictEqual(
+    .toStrictEqual(
       [
         'U04DE8L08R5',
         'U04DRTFB6QM',
@@ -109,5 +109,5 @@ test('#2 filterRestriction w/ restrictions', () => {
       },
     ],
   ))
-    .resolves.toHaveLength(4);
+    .toHaveLength(4);
 });
