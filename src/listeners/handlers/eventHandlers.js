@@ -38,19 +38,22 @@ export const newChannel = (channelMembers, allMembers, channel_id) => {
   const date = new Date();
   const lastPairing = new Date(date.setDate(date.getDate() - 28));
 
-  // Create channel object to insert into DB
-  const membersObj = channelMembers.reduce((acc, curr) => {
+  // Create members array to insert into channel object\
+  const membersArr = channelMembers.reduce((acc, curr) => {
     const member = allMembers.find(member =>
       member.id === curr);
-    acc[curr] = {
-      name: member.real_name,
-      frequency: '14',
-      lastPairing: lastPairing,
-      restrict: [],
-      isActive: true,
-    };
+    acc.push({
+      [curr]: {
+        id: curr,
+        name: member.name,
+        frequency: '14',
+        lastPairing: lastPairing,
+        restrict: [],
+        isActive: true,
+      }
+    });
     return acc;
-  }, {});
+  }, []);
   const channelObj = {};
   const { currentDate, firstPairDate } = installDate();
   channelObj.isActive = true;
@@ -62,7 +65,7 @@ export const newChannel = (channelMembers, allMembers, channel_id) => {
     $set: {
       [channel_id]: {
         ...channelObj,
-        members: membersObj
+        members: membersArr
       }
     },
   };
@@ -71,42 +74,54 @@ export const newChannel = (channelMembers, allMembers, channel_id) => {
 };
 
 
-export const oldChannel = (channelMembers, allMembers, channel_id, channel) => {
+export const oldChannel = (channelMembers, allMembers, channel_id, channelObj) => {
   const date = new Date();
   // Set default frequencies for any new members
   for (let i = 0; i < channelMembers.length; i++) {
     const member = allMembers.find(member =>
       member.id === channelMembers[i]);
-    if (!channel.members[channelMembers[i]]) {
-      channel.members[channelMembers[i]] = {
-        name: member.real_name,
-        frequency: '14',
-        lastPairing: new Date(date.setDate(date.getDate() - 28)),
-        isActive: true,
-        restrict: []
-      };
+
+    const memberObj = channelObj.members.find(element => {
+      const id = Object.keys(element)[0];
+      return id === member.id;
+    });
+
+
+    if (memberObj === undefined) {
+      channelObj.members.push({
+        [member.id]: {
+          id: member.id,
+          name: member.name,
+          frequency: '14',
+          lastPairing: new Date(date.setDate(date.getDate() - 28)),
+          isActive: true,
+          restrict: []
+        }
+      });
     }
   }
 
   // Set isActive to false for any members who have since left the channel
-  for (const member in channel.members) {
-    if (!channelMembers.includes(member)) {
-      channel.members[member] = {
-        ...channel.members[member],
+
+  for (let i = 0; i < channelObj.members.length; i++) {
+    const id = Object.keys(channelObj.members[i])[0];
+    if (!channelMembers.includes(id)) {
+      channelObj.members[i][id] = {
+        ...channelObj.members[i][id],
         isActive: false
       };
     }
   }
 
   const { currentDate, nextPairDate } = installDate();
-  channel.reinstallDate = currentDate;
-  channel.nextPairDate = nextPairDate;
+  channelObj.reinstallDate = currentDate;
+  channelObj.nextPairDate = nextPairDate;
 
   // Create doc to insert into DB
   const updateDoc = {
     $set: {
       [channel_id]: {
-        ...channel,
+        ...channelObj,
         isActive: true
       }
     },
@@ -131,42 +146,43 @@ export const leaveChannel = (channel_id, channel) => {
 };
 
 
-export const memberJoins = (user_id, channel_id, channel) => {
+export const memberJoins = (user_id, allMembers, channel_id, channelObj) => {
   const date = new Date();
+  const member = allMembers.find(member =>
+    member.id === user_id);
+  channelObj.members.push({
+    [user_id]: {
+      id: member.id,
+      frequency: '14',
+      name: member.name,
+      lastPairing: new Date(date.setDate(date.getDate() - 28)),
+      restrict: [],
+      isActive: true,
+    }
+  });
 
   // Create doc to insert into DB
   return {
     $set: {
       [channel_id]: {
-        ...channel,
-        members: {
-          ...channel.members,
-          [user_id]: {
-            frequency: '14',
-            lastPairing: new Date(date.setDate(date.getDate() - 28)),
-            restrict: [],
-            isActive: true,
-          }
-        }
+        ...channelObj,
       }
     },
   };
 };
 
 
-export const memberLeaves = (user_id, user, channel_id, channel) => {
+export const memberLeaves = (user_id, channel_id, channelObj) => {
+  const index = channelObj.members.findIndex(member => {
+    return Object.keys(member)[0] === user_id;
+  });
+  channelObj.members[index][user_id].isActive = false;
+
   // Create doc to insert into DB
   return {
     $set: {
       [channel_id]: {
-        ...channel,
-        members: {
-          ...channel.members,
-          [user_id]: {
-            ...user,
-            isActive: false
-          }
-        }
+        ...channelObj
       }
     },
   };

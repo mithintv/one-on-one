@@ -2,51 +2,51 @@ export let allMembers =
   [
     {
       id: 'USLACKBOT',
-      real_name: 'Slackbot',
+      name: 'Slackbot',
     },
     {
       id: 'U04DE8L08R5',
-      real_name: 'Mithin',
+      name: 'Mithin',
     },
     {
       id: 'U04DRTFB6QM',
-      real_name: 'Prakash',
+      name: 'Prakash',
     },
     {
       id: 'U04DUNDBE03',
-      real_name: 'oneonone-x',
+      name: 'oneonone-x',
     },
     {
       id: 'U04E7P6LJ6M',
-      real_name: 'oneonone',
+      name: 'oneonone',
     },
     {
       id: 'U04E9FBUTL7',
-      real_name: 'deactivateduser965000',
+      name: 'deactivateduser965000',
     },
     {
       id: 'U04EHD34KGW',
-      real_name: 'Offereop',
+      name: 'Offereop',
     },
     {
       id: 'U04EMKFLADB',
-      real_name: 'Bob',
+      name: 'Bob',
     },
     {
       id: 'U04EPTE4TU3',
-      real_name: 'Nannu',
+      name: 'Nannu',
     },
     {
       id: 'U04EQ19AY3U',
-      real_name: 'deactivateduser793337',
+      name: 'deactivateduser793337',
     },
     {
       id: 'U04ESESV56G',
-      real_name: 'Cuarine',
+      name: 'Cuarine',
     },
     {
       id: 'U04FDNKH2L8',
-      real_name: 'mithingeorge1993',
+      name: 'mithingeorge1993',
     }
   ];
 

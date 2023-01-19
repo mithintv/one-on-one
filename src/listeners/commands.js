@@ -46,10 +46,10 @@ const block = async ({ client, command, ack, respond }) => {
       return;
     } else {
       // Get all users list w/ usernames
-      const { members: allMembers } = await client.users.list();
+      // const { members: allMembers } = await client.users.list();
 
       // Block command logic
-      const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, allMembers, channelMembers);
+      const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, channelMembers);
 
       if (updateDoc !== null) {
         const result = await updateInstallation(team_id, updateDoc);

@@ -47,7 +47,7 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
 };
 
 
-export const setBlock = (channelObj, channel_id, user_id, params, allMembers, channelMembers) => {
+export const setBlock = (channelObj, channel_id, user_id, params, channelMembers) => {
   let response = "";
   const block = channelObj.members[user_id].restrict;
   // If user is inactive, respond with failure
@@ -69,16 +69,22 @@ export const setBlock = (channelObj, channel_id, user_id, params, allMembers, ch
   }
   // If parameters are set, begin block logic
   else {
+    let t1 = performance.now();
     // Create array from passed in usernames
     const splitParams = params.replaceAll("@", "").split(" ");
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};
-    for (let i = 0; i < allMembers.length; i++) {
-      if (!memberNames[allMembers[i].name]) {
-        memberNames[allMembers[i].name] = allMembers[i].id;
+    for (const key in channelObj.members) {
+      if (!memberNames[channelObj.members[key].name]) {
+        memberNames[channelObj.members[key].name] = `${key}`;
       }
     }
+    // for (let i = 0; i < allMembers.length; i++) {
+    //   if (!memberNames[allMembers[i].name]) {
+    //     memberNames[allMembers[i].name] = allMembers[i].id;
+    //   }
+    // }
 
     // Loop through params and replace user names with user_ids
     for (let i = 0; i < splitParams.length; i++) {
@@ -86,6 +92,8 @@ export const setBlock = (channelObj, channel_id, user_id, params, allMembers, ch
         splitParams[i] = memberNames[splitParams[i]];
       };
     }
+    let t2 = performance.now();
+    console.log(t2 - t1);
 
     // Check if passed in members are members of the channel
     const invalidMembers = splitParams.filter(member => !channelMembers.includes(member));

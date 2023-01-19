@@ -4,7 +4,7 @@ import { setTime, getTime, interval } from "../lib/constants.js";
 
 const mention = async ({ client, event }) => {
   try {
-    // console.log(event);
+    console.log(event);
   }
   catch (error) {
     console.error(error);
@@ -108,7 +108,8 @@ const joined = async ({ client, event }) => {
 
     // Slack sends member_join events only if bot has joined a channel so by default this block should only run for new members in a channel that bot is already in
     else if (bot_id !== event.user) {
-      const updateDoc = memberJoins(event.user, channel_id, channelObj);
+      const { members: allMembers } = await client.users.list();
+      const updateDoc = memberJoins(event.user, allMembers, channel_id, channelObj);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
@@ -172,11 +173,8 @@ const left = async ({ client, event }) => {
 
     // If member leaves a channel bot is in...
     else {
-      // Fetch user object from DB
-      const user = channel[user_id];
-
       // Create update doc that sets isActive to false upon a user leaving or being removed from the channel
-      const updateDoc = memberLeaves(user_id, user, channel_id, channel);
+      const updateDoc = memberLeaves(user_id, channel_id, channel);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
