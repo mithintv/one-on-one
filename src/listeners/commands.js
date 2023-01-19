@@ -46,10 +46,10 @@ const block = async ({ client, command, ack, respond }) => {
       return;
     } else {
       // Get all users list w/ usernames
-      const { members: allMembers } = await client.users.list();
+      // const { members: allMembers } = await client.users.list();
 
       // Block command logic
-      const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, allMembers, channelMembers);
+      const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, channelMembers);
 
       if (updateDoc !== null) {
         const result = await updateInstallation(team_id, updateDoc);
@@ -78,27 +78,17 @@ const unblock = async ({ client, command, ack, respond }) => {
       return;
     } else {
 
-      // Get users list
-      const apiResponse = await client.users.list();
-      if (apiResponse.ok) {
+      const { updateDoc, response } = setUnblock(channelObj, channel_id, user_id, params, channelMembers);
 
-        const { updateDoc, response } = setUnblock(channelObj, channel_id, user_id, params, apiResponse.members, channelMembers);
-
-        // Save to DB
-        if (updateDoc !== null) {
-          const result = await updateInstallation(team_id, updateDoc);
-          if (result.acknowledged && result.modifiedCount) {
-            console.log(`Successfully removed ${user_id}'s restrictions in ${channel_id} for ${team_id}`);
-          } else throw new Error(`Error removing ${user_id}'s restrictions in ${channel_id} for ${team_id}`);
-        }
-        await respond(response);
-
-      } else if (apiResponse.error === 'limit_required') {
-        await respond('Your team size is currently not supported by this slackbot. Please contact the developer.');
-      } else {
-        await respond(`An error occurred: ${apiResponse.error}. Please contact the developer.`);
-        throw new Error(`An error occurred with calling client.users.list(): ${apiResponse.error}`);
+      // Save to DB
+      if (updateDoc !== null) {
+        const result = await updateInstallation(team_id, updateDoc);
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Successfully removed ${user_id}'s restrictions in ${channel_id} for ${team_id}`);
+        } else throw new Error(`Error removing ${user_id}'s restrictions in ${channel_id} for ${team_id}`);
       }
+      await respond(response);
+
     }
   } catch (error) {
     console.error(error);

@@ -16,22 +16,24 @@ export const shuffle = (array) => {
   return array;
 };
 
-export const filterActive = (channelMembers, membersObj) => {
+export const filterActive = (channelMembers, membersArr) => {
   const activeMembers = [];
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (membersObj[channelMembers[i]].isActive) {
-      activeMembers.push(channelMembers[i]);
+  for (let i = 0; i < membersArr.length; i++) {
+    const key = Object.keys(membersArr[i])[0];
+    if (membersArr[i][key].isActive) {
+      activeMembers.push(key);
     }
   }
   return activeMembers;
 };
 
-export const filterFrequency = (activeMembers, membersObj) => {
+export const filterFrequency = (activeMembers, membersArr) => {
   const currentDate = new Date();
   let readyMembers = [];
   for (let i = 0; i < activeMembers.length; i++) {
-    const lastPairDate = new Date(membersObj[activeMembers[i]].lastPairing.toISOString());
-    const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersObj[activeMembers[i]].frequency)));
+    const index = membersArr.findIndex(member => Object.keys(member)[0] === activeMembers[i]);
+    const lastPairDate = new Date(membersArr[index][activeMembers[i]].lastPairing.toISOString());
+    const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersArr[index][activeMembers[i]].frequency)));
     if (currentDate.getTime() > nextPairDate.getTime()) {
       readyMembers.push(activeMembers[i]);
     };
@@ -39,17 +41,19 @@ export const filterFrequency = (activeMembers, membersObj) => {
   return { readyMembers, currentDate };
 };
 
-export const filterRestriction = async (readyMembers, membersObj) => {
+export const filterRestriction = (readyMembers, membersArr) => {
   for (let i = 0; i < readyMembers.length; i++) {
+    const index = membersArr.findIndex(member => Object.keys(member)[0] === readyMembers[i]);
+
     if (readyMembers[i] === readyMembers[i + 1]) {
       readyMembers = shuffle(readyMembers);
       i = 0;
     }
-    if (membersObj[readyMembers[i]].restrict.length !== 0 && i % 2 === 0 && membersObj[readyMembers[i]].restrict.includes(readyMembers[i + 1])) {
+    if (membersArr[index][readyMembers[i]].restrict.length !== 0 && i % 2 === 0 && membersArr[index][readyMembers[i]].restrict.includes(readyMembers[i + 1])) {
       readyMembers = shuffle(readyMembers);
       i = 0;
     }
-    else if (membersObj[readyMembers[i]].restrict.length !== 0 && i % 2 !== 0 && membersObj[readyMembers[i]].restrict.includes(readyMembers[i - 1])) {
+    else if (membersArr[index][readyMembers[i]].restrict.length !== 0 && i % 2 !== 0 && membersArr[index][readyMembers[i]].restrict.includes(readyMembers[i - 1])) {
       readyMembers = shuffle(readyMembers);
       i = 0;
     }

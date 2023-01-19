@@ -1,16 +1,16 @@
-export let allMembers = [
+export let allMembers =
   [
     {
       id: 'USLACKBOT',
-      name: 'slackbot',
+      name: 'Slackbot',
     },
     {
       id: 'U04DE8L08R5',
-      name: 'mithingthomas',
+      name: 'Mithin',
     },
     {
       id: 'U04DRTFB6QM',
-      name: 'prakashundaragan',
+      name: 'Prakash',
     },
     {
       id: 'U04DUNDBE03',
@@ -26,15 +26,15 @@ export let allMembers = [
     },
     {
       id: 'U04EHD34KGW',
-      name: 'mithin.thomas',
+      name: 'Offereop',
     },
     {
       id: 'U04EMKFLADB',
-      name: 'bobhanks69',
+      name: 'Bob',
     },
     {
       id: 'U04EPTE4TU3',
-      name: 'mgt1993',
+      name: 'Nannu',
     },
     {
       id: 'U04EQ19AY3U',
@@ -42,14 +42,13 @@ export let allMembers = [
     },
     {
       id: 'U04ESESV56G',
-      name: 'contact',
+      name: 'Cuarine',
     },
     {
       id: 'U04FDNKH2L8',
       name: 'mithingeorge1993',
     }
-  ]
-];
+  ];
 
 export let channelMembers = ['U04DE8L08R5', 'U04DRTFB6QM', 'U04EPTE4TU3', 'U04ESESV56G'];
 

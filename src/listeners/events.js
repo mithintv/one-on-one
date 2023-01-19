@@ -4,7 +4,7 @@ import { setTime, getTime, interval } from "../lib/constants.js";
 
 const mention = async ({ client, event }) => {
   try {
-    // console.log(event);
+    console.log(event);
   }
   catch (error) {
     console.error(error);
@@ -30,6 +30,8 @@ const joined = async ({ client, event }) => {
 
     // Run function if joined member is bot
     if (bot_id === user_id) {
+
+      const { members: allMembers } = await client.users.list();
 
       // Delete messages sent by bot in dev mode
       if (process.env.NODE_ENV === 'development') {
@@ -77,7 +79,7 @@ const joined = async ({ client, event }) => {
 
       // If channel doesn't exist, create one with default values. Otherwise, set default values for any new members, keep existing values for old members and set isActive to false for members who have since left the channel
       let updateDoc = {};
-      channelObj ? updateDoc = oldChannel(channelMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, channel_id);
+      channelObj ? updateDoc = oldChannel(channelMembers, allMembers, channel_id, channelObj) : updateDoc = newChannel(channelMembers, allMembers, channel_id);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
@@ -106,7 +108,8 @@ const joined = async ({ client, event }) => {
 
     // Slack sends member_join events only if bot has joined a channel so by default this block should only run for new members in a channel that bot is already in
     else if (bot_id !== event.user) {
-      const updateDoc = memberJoins(event.user, channel_id, channelObj);
+      const { members: allMembers } = await client.users.list();
+      const updateDoc = memberJoins(event.user, allMembers, channel_id, channelObj);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
@@ -170,11 +173,8 @@ const left = async ({ client, event }) => {
 
     // If member leaves a channel bot is in...
     else {
-      // Fetch user object from DB
-      const user = channel[user_id];
-
       // Create update doc that sets isActive to false upon a user leaving or being removed from the channel
-      const updateDoc = memberLeaves(user_id, user, channel_id, channel);
+      const updateDoc = memberLeaves(user_id, channel_id, channel);
 
       // Save to DB
       const result = await updateInstallation(team_id, updateDoc);
