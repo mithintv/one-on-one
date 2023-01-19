@@ -49,9 +49,12 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
 
 export const setBlock = (channelObj, channel_id, user_id, params, channelMembers) => {
   let response = "";
-  const block = channelObj.members[user_id].restrict;
+  const index = channelObj.members.findIndex(member => {
+    return Object.keys(member)[0] === user_id;
+  });
+  const block = channelObj.members[index][user_id].restrict;
   // If user is inactive, respond with failure
-  if (!channelObj.members[user_id].isActive) {
+  if (!channelObj.members[index][user_id].isActive) {
     response = '/block can only be called for active users. Set yourself active for pairing with the /pair command first.';
     return { updateDoc: null, response };
   }
@@ -75,11 +78,18 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};
-    for (const key in channelObj.members) {
-      if (!memberNames[channelObj.members[key].name]) {
-        memberNames[channelObj.members[key].name] = `${key}`;
+    for (let i = 0; i < channelObj.members.length; i++) {
+      const key = Object.keys(channelObj.members[i])[0];
+      if (!memberNames[channelObj.members[i][key].name]) {
+        memberNames[channelObj.members[i][key].name] = channelObj.members[i][key].id;
       }
     }
+
+    // for (const key in channelObj.members) {
+    //   if (!memberNames[channelObj.members[key].name]) {
+    //     memberNames[channelObj.members[key].name] = `${key}`;
+    //   }
+    // }
     // for (let i = 0; i < allMembers.length; i++) {
     //   if (!memberNames[allMembers[i].name]) {
     //     memberNames[allMembers[i].name] = allMembers[i].id;
@@ -92,27 +102,30 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
         splitParams[i] = memberNames[splitParams[i]];
       };
     }
+    console.log(splitParams);
     let t2 = performance.now();
     console.log(t2 - t1);
 
     // Check if passed in members are members of the channel
     const invalidMembers = splitParams.filter(member => !channelMembers.includes(member));
+    console.log(invalidMembers);
     const validMembers = splitParams.filter(member => channelMembers.includes(member));
+    console.log(validMembers);
 
-    if (channelObj.members[user_id].restrict.length === 0 && validMembers.length === 0) {
+    if (channelObj.members[index][user_id].restrict.length === 0 && validMembers.length === 0) {
       response = "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\n";
     } else {
       response = "You are currently not being paired with the following members in this channel for one-on-one's:\n";
     }
 
     // Insert current restrictions to response
-    channelObj.members[user_id].restrict.forEach(element => {
+    channelObj.members[index][user_id].restrict.forEach(element => {
       response += `<@${element}>\n`;
     });
 
     // Insert new restrictions to response
     validMembers.forEach(element => {
-      channelObj.members[user_id].restrict.push(element);
+      channelObj.members[index][user_id].restrict.push(element);
       response += `<@${element}>\n`;
     });
 
