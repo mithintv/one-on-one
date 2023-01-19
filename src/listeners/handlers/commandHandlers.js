@@ -22,10 +22,13 @@ export default async function commandHandler(client, command) {
 
 
 export const setFrequency = (channelObj, channel_id, user_id, params) => {
+  const index = channelObj.members.findIndex(member => {
+    return Object.keys(member)[0] === user_id;
+  });
   // If no parameters are set, respond with current frequency
-  const frequency = channelObj.members[user_id].frequency;
+  const frequency = channelObj.members[index][user_id].frequency;
 
-  if (!channelObj.members[user_id].isActive) {
+  if (!channelObj.members[index][user_id].isActive) {
     return (`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
   }
   else if (params.length === 0) {
@@ -33,7 +36,7 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
   }
   // If a parameter is passed and is a valid number from 1 to 90, set it as new frequency
   else if (params && parseInt(params) !== NaN && parseInt(params) >= 1 && parseInt(params) <= 90) {
-    channelObj.members[user_id].frequency = params;
+    channelObj.members[index][user_id].frequency = params;
     // Create a document that sets the frequency of specific user
     return {
       $set: {
@@ -72,7 +75,6 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
   }
   // If parameters are set, begin block logic
   else {
-    let t1 = performance.now();
     // Create array from passed in usernames
     const splitParams = params.replaceAll("@", "").split(" ");
 
@@ -85,25 +87,12 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
       }
     }
 
-    // for (const key in channelObj.members) {
-    //   if (!memberNames[channelObj.members[key].name]) {
-    //     memberNames[channelObj.members[key].name] = `${key}`;
-    //   }
-    // }
-    // for (let i = 0; i < allMembers.length; i++) {
-    //   if (!memberNames[allMembers[i].name]) {
-    //     memberNames[allMembers[i].name] = allMembers[i].id;
-    //   }
-    // }
-
     // Loop through params and replace user names with user_ids
     for (let i = 0; i < splitParams.length; i++) {
       if (memberNames[splitParams[i]]) {
         splitParams[i] = memberNames[splitParams[i]];
       };
     }
-    let t2 = performance.now();
-    console.log(t2 - t1);
 
     // Check if passed in members are members of the channel
     const invalidMembers = splitParams.filter(member => !channelMembers.includes(member));
@@ -148,7 +137,7 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
 };
 
 
-export const setUnblock = (channelObj, channel_id, user_id, params, allMembers, channelMembers) => {
+export const setUnblock = (channelObj, channel_id, user_id, params, channelMembers) => {
   let updateDoc = null;
   let response = "";
   const index = channelObj.members.findIndex(member => {
@@ -272,8 +261,11 @@ export const setUnblock = (channelObj, channel_id, user_id, params, allMembers, 
 
 
 export const isActive = (channelObj, channel_id, user_id) => {
-  if (!channelObj.members[user_id].isActive) {
-    channelObj.members[user_id].isActive = true;
+  const index = channelObj.members.findIndex(member => {
+    return Object.keys(member)[0] === user_id;
+  });
+  if (!channelObj.members[index][user_id].isActive) {
+    channelObj.members[index][user_id].isActive = true;
     return {
       $set: {
         [channel_id]: {
@@ -286,8 +278,11 @@ export const isActive = (channelObj, channel_id, user_id) => {
 
 
 export const isInactive = (channelObj, channel_id, user_id) => {
-  if (channelObj.members[user_id].isActive) {
-    channelObj.members[user_id].isActive = false;
+  const index = channelObj.members.findIndex(member => {
+    return Object.keys(member)[0] === user_id;
+  });
+  if (channelObj.members[index][user_id].isActive) {
+    channelObj.members[index][user_id].isActive = false;
     return {
       $set: {
         [channel_id]: {

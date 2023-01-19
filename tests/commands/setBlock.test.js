@@ -1,7 +1,7 @@
 import { setBlock } from "../../src/listeners/handlers/commandHandlers";
 import { channelMembers } from "../testVariables";
 
-test('/block command fired with w/o params for active user', () => {
+test('#1 /block w/o params for active user', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -52,7 +52,7 @@ test('/block command fired with w/o params for active user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "You are currently being paired with everyone on this channel for one-on-one's with no restrictions." });
 });
 
-test('/block command fired with w/o params for inactive user', () => {
+test('#2 /block w/o params for inactive user', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -104,7 +104,7 @@ test('/block command fired with w/o params for inactive user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: '/block can only be called for active users. Set yourself active for pairing with the /pair command first.' });
 });
 
-test('/block command fired with w/o params for active user w/ restrictions', () => {
+test('#3 /block w/o params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -155,7 +155,7 @@ test('/block command fired with w/o params for active user w/ restrictions', () 
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "You are currently not being paired with the following members in this channel for one-on-one's:\n<@U04EPTE4TU3>\n" });
 });
 
-test('/block command fired with w/ single params for active user w/ restrictions', () => {
+test('#4 /block w/ single params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -259,7 +259,7 @@ test('/block command fired with w/ single params for active user w/ restrictions
   });
 });
 
-test('/block command fired with w/ single params for active user w/o restrictions', () => {
+test('#5 /block w/ single params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -363,7 +363,7 @@ test('/block command fired with w/ single params for active user w/o restriction
   });
 });
 
-test('/block command fired with w/ multi params for active user w/ restrictions', () => {
+test('#6 /block w/ multi params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -467,7 +467,7 @@ test('/block command fired with w/ multi params for active user w/ restrictions'
   });
 });
 
-test('/block command fired with w/ multi params for active user w/o restrictions', () => {
+test('#7 /block w/ multi params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -571,7 +571,7 @@ test('/block command fired with w/ multi params for active user w/o restrictions
   });
 });
 
-test('/block command fired with w/ invalid single params for active user w/ restrictions', () => {
+test('#8 /block w/ invalid single params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -675,7 +675,7 @@ test('/block command fired with w/ invalid single params for active user w/ rest
   });
 });
 
-test('/block command fired with w/ invalid single params for active user w/o restrictions', () => {
+test('#9 /block w/ invalid single params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -779,7 +779,7 @@ test('/block command fired with w/ invalid single params for active user w/o res
   });
 });
 
-test('/block command fired with w/ invalid multi params for active user w/ restrictions', () => {
+test('#10 /block w/ invalid multi params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),
@@ -883,7 +883,7 @@ test('/block command fired with w/ invalid multi params for active user w/ restr
   });
 });
 
-test('/block command fired with w/ invalid multi params for active user w/o restrictions', () => {
+test('#11 /block w/ invalid multi params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
     installDate: new Date('2022-12-21T16:18:35.654Z'),

@@ -16,11 +16,12 @@ export const shuffle = (array) => {
   return array;
 };
 
-export const filterActive = (channelMembers, membersObj) => {
+export const filterActive = (channelMembers, membersArr) => {
   const activeMembers = [];
-  for (let i = 0; i < channelMembers.length; i++) {
-    if (membersObj[channelMembers[i]].isActive) {
-      activeMembers.push(channelMembers[i]);
+  for (let i = 0; i < membersArr.length; i++) {
+    const key = Object.keys(membersArr[i])[0];
+    if (membersArr[i][key].isActive) {
+      activeMembers.push(key);
     }
   }
   return activeMembers;
