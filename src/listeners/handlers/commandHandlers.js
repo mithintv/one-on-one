@@ -14,10 +14,17 @@ export default async function commandHandler(client, command) {
 
   // Check channel, members, and user existence
   const channelObj = teamObj && teamObj[channel_id] ? teamObj[channel_id] : undefined;
-  const membersObj = channelObj && channelObj.members ? channelObj.members : undefined;
-  const userObj = channelObj && channelObj.members[user_id] ? channelObj.members[user_id] : undefined;
+  const membersArr = channelObj && channelObj.members ? channelObj.members : undefined;
+  let userObj = undefined;
 
-  return { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj };
+  if (membersArr) {
+    const index = membersArr.findIndex(element => Object.keys(element)[0] === user_id);
+
+    userObj = membersArr[index][user_id];
+  }
+
+
+  return { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, teamObj, channelObj, membersArr, userObj };
 }
 
 
@@ -29,10 +36,10 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
   const frequency = channelObj.members[index][user_id].frequency;
 
   if (!channelObj.members[index][user_id].isActive) {
-    return (`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
+    return (`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
   }
   else if (params.length === 0) {
-    return (`Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
+    return (`Your current frequency of one-on-ones in this channel is every ${frequency} days.`);
   }
   // If a parameter is passed and is a valid number from 1 to 90, set it as new frequency
   else if (params && parseInt(params) !== NaN && parseInt(params) >= 1 && parseInt(params) <= 90) {
@@ -46,11 +53,12 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
       },
     };
   }
-  else return (`You inputted an invalid value for frequency of one-on-one's. Only numeric values from 1 to 90 are accepted. Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
+  else return (`You inputted an invalid value for frequency of one-on-ones. Only numeric values from 14 to 90 are accepted. Your current frequency of one-on-one's in this channel is every ${frequency} days.`);
 };
 
 
 export const setBlock = (channelObj, channel_id, user_id, params, channelMembers) => {
+  let updateDoc = null;
   let response = "";
   const index = channelObj.members.findIndex(member => {
     return Object.keys(member)[0] === user_id;
@@ -58,20 +66,20 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
   const block = channelObj.members[index][user_id].restrict;
   // If user is inactive, respond with failure
   if (!channelObj.members[index][user_id].isActive) {
-    response = '/block can only be called for active users. Set yourself active for pairing with the /pair command first.';
-    return { updateDoc: null, response };
+    response = '/ono-block can only be called for active users. Set yourself active for pairing with the /ono-active command first.';
+    return { updateDoc, response };
   }
   // If no parameters are set, respond with current restrictions
   else if (params.length === 0 && block.length === 0) {
-    response = "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.";
-    return { updateDoc: null, response };
+    response = "You are currently being paired with everyone on this channel for one-on-ones with no restrictions.";
+    return { updateDoc, response };
   }
   else if (params.length === 0) {
-    response = "You are currently not being paired with the following members in this channel for one-on-one's:\n";
+    response = "You are currently not being paired with the following members in this channel for one-on-ones:\n";
     block.forEach(element => {
       response += `<@${element}>\n`;
     });
-    return { updateDoc: null, response };
+    return { updateDoc, response };
   }
   // If parameters are set, begin block logic
   else {
@@ -107,40 +115,43 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
     const validMembers = splitParams.filter(member => channelMembers.includes(member));
 
     if (channelObj.members[index][user_id].restrict.length === 0 && validMembers.length === 0) {
-      response = "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\n";
+      response = "You are currently being paired with everyone on this channel for one-on-ones with no restrictions.\n";
+    } else if (validMembers.length === 0) {
+      response = "The /ono-block command must be called with a user in the channel or a list of users in the channel you wish to block.\n";
     } else {
-      response = "You are currently not being paired with the following members in this channel for one-on-one's:\n";
+      response = "You are currently not being paired with the following members in this channel for one-on-ones:\n";
+      // Insert current restrictions to response
+      channelObj.members[index][user_id].restrict.forEach(element => {
+        response += `<@${element}>\n`;
+      });
     }
 
-    // Insert current restrictions to response
-    channelObj.members[index][user_id].restrict.forEach(element => {
-      response += `<@${element}>\n`;
-    });
+    if (validMembers.length > 0) {
+      // Insert new restrictions to response
+      validMembers.forEach(element => {
+        channelObj.members[index][user_id].restrict.push(element);
+        response += `<@${element}>\n`;
+      });
 
-    // Insert new restrictions to response
-    validMembers.forEach(element => {
-      channelObj.members[index][user_id].restrict.push(element);
-      response += `<@${element}>\n`;
-    });
+      updateDoc = {
+        $set: {
+          [channel_id]: {
+            ...channelObj,
+          }
+        }
+      };
+    }
+
 
     if (invalidMembers.length > 0) {
-      response += 'The following members are not in this channel and were ignored for the /block command:\n';
+      response += 'The following members are not in this channel and were ignored for the command:\n';
       invalidMembers.forEach(element => {
         response += `<@${element}>\n`;
       });
     }
 
     // Create a document that sets the restrict key of a specific user on a specific channel
-    return {
-      updateDoc: {
-        $set: {
-          [channel_id]: {
-            ...channelObj,
-          }
-        }
-      },
-      response
-    };
+    return { updateDoc, response };
   }
 };
 
@@ -154,17 +165,17 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
   const block = channelObj.members[index][user_id].restrict;
   // If user is inactive, respond with failure
   if (!channelObj.members[index][user_id].isActive) {
-    response = '/unblock can only be called for active users. Set yourself active for pairing with the /pair command first.';
+    response = '/ono-unblock can only be called for active users. Set yourself active for pairing with the /ono-active command first.';
     return { updateDoc, response };
   }
   // If no parameters are set, output current restrictions
   if (params.length === 0 && block.length === 0) {
-    response = "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently being paired with everyone on this channel for one-on-one's with no restrictions.";
+    response = "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently being paired with everyone on this channel for one-on-ones with no restrictions.";
     return { updateDoc, response };
   }
 
   else if (params.length === 0 && block.length > 0) {
-    response = "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently not being paired with the following members in this channel for one-on-one's:\n";
+    response = "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently not being paired with the following members in this channel for one-on-ones:\n";
     block.forEach(element => {
       response += `<@${element}>\n`;
     });
@@ -172,7 +183,7 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
   }
 
   else if (block.length === 0) {
-    response = "You are already being paired with everyone on this channel for one-on-one's with no restrictions.";
+    response = "You are already being paired with everyone on this channel for one-on-ones with no restrictions.";
     return { updateDoc, response };
   }
 
@@ -224,15 +235,15 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
 
 
     if (channelObj.members[index][user_id].restrict.length === 0 && validMembers.length === 0) {
-      response = "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently being paired with everyone on this channel for one-on-one's with no restrictions.";
+      response = "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently being paired with everyone on this channel for one-on-ones with no restrictions.";
     }
 
     else if (validMembers.length === 0) {
-      response = "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock.\n";
+      response = "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock.\n";
     }
 
+    // Create a document that sets the restrict key of a specific user on a specific channel
     else {
-      // Create a document that sets the restrict key of a specific user on a specific channel
       let currentRestrictions = channelObj.members[index][user_id].restrict;
       let newRestrictions = [];
       for (let i = 0; i < validMembers.length; i++) {
@@ -249,7 +260,7 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
       };
 
       // Create responses to return along with updateDoc
-      response = "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n";
+      response = "You have succesfully removed the following members from your one-on-one block list for this channel:\n";
       validMembers.forEach(element => {
         response += `<@${element}>\n`;
       });
@@ -264,7 +275,7 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
     }
 
     if (invalidMembers.length > 0) {
-      response += 'The following members are not in this channel and were ignored for the /unblock command:\n';
+      response += 'The following members are not in this channel and were ignored for the command:\n';
       invalidMembers.forEach(element => {
         response += `<@${element}>\n`;
       });

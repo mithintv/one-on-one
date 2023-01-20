@@ -49,7 +49,7 @@ test('#1 /frequency w/o params for inactive user', () => {
       },
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', ''))
-    .toStrictEqual(`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
+    .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
 
 test('#2 /frequency w/o params for active user', () => {
@@ -101,7 +101,7 @@ test('#2 /frequency w/o params for active user', () => {
       },
     ],
   }, 'C04DUMG5QCT', 'U04DRTFB6QM', ''))
-    .toStrictEqual(`Your current frequency of one-on-one's in this channel is every 14 days.`);
+    .toStrictEqual(`Your current frequency of one-on-ones in this channel is every 14 days.`);
 });
 
 test('#3 /frequency w/ params for active user', () => {
@@ -256,7 +256,7 @@ test('#4 /frequency w/ params for inactive user', () => {
       },
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '21'))
-    .toStrictEqual(`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
+    .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
 
 test('#5 /frequency w/ invalid params for active user', () => {
@@ -308,7 +308,7 @@ test('#5 /frequency w/ invalid params for active user', () => {
       },
     ],
   }, 'C04DUMG5QCT', 'U04DRTFB6QM', '91'))
-    .toStrictEqual(`You inputted an invalid value for frequency of one-on-one's. Only numeric values from 1 to 90 are accepted. Your current frequency of one-on-one's in this channel is every 14 days.`);
+    .toStrictEqual(`You inputted an invalid value for frequency of one-on-ones. Only numeric values from 14 to 90 are accepted. Your current frequency of one-on-one's in this channel is every 14 days.`);
 });
 
 test('#6 /frequency w/ invalid params for inactive user', () => {
@@ -360,7 +360,7 @@ test('#6 /frequency w/ invalid params for inactive user', () => {
       },
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '91'))
-    .toStrictEqual(`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
+    .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
 
 test('#7 /frequency w/ duplicate params for active user', () => {

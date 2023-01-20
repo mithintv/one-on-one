@@ -34,9 +34,11 @@ export const filterFrequency = (activeMembers, membersArr) => {
   let readyMembers = [];
   for (let i = 0; i < activeMembers.length; i++) {
     const index = membersArr.findIndex(member => Object.keys(member)[0] === activeMembers[i]);
-    const lastPairDate = new Date(membersArr[index][activeMembers[i]].lastPairing.toISOString());
-    const nextPairDate = new Date(lastPairDate[setTime](lastPairDate[getTime]() + parseInt(membersArr[index][activeMembers[i]].frequency)));
-    if (currentDate[getTime]() > nextPairDate[getTime]()) {
+    const userObj = membersArr[index][activeMembers[i]];
+    const lastPairDate = new Date(userObj.lastPairing.toISOString());
+    const nextPairDate = new Date(lastPairDate[setTime](lastPairDate[getTime]() + parseInt(userObj.frequency)));
+
+    if (currentDate > nextPairDate) {
       readyMembers.push(activeMembers[i]);
     };
   }
