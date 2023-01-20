@@ -14,10 +14,17 @@ export default async function commandHandler(client, command) {
 
   // Check channel, members, and user existence
   const channelObj = teamObj && teamObj[channel_id] ? teamObj[channel_id] : undefined;
-  const membersObj = channelObj && channelObj.members ? channelObj.members : undefined;
-  const userObj = channelObj && channelObj.members[user_id] ? channelObj.members[user_id] : undefined;
+  const membersArr = channelObj && channelObj.members ? channelObj.members : undefined;
+  let userObj = undefined;
 
-  return { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, teamObj, channelObj, membersObj, userObj };
+  if (membersArr) {
+    const index = membersArr.findIndex(element => Object.keys(element)[0] === user_id);
+
+    userObj = membersArr[index][user_id];
+  }
+
+
+  return { team_id, channel_id, user_id, params, bot_id, membership, channelMembers, teamObj, channelObj, membersArr, userObj };
 }
 
 

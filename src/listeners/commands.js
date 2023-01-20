@@ -1,5 +1,6 @@
 import { updateInstallation } from "../lib/mongo.js";
 import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
+import { setTime, getTime, interval } from "../lib/constants.js";
 
 const frequency = async ({ client, command, ack, respond }) => {
   try {
@@ -45,9 +46,6 @@ const block = async ({ client, command, ack, respond }) => {
       await respond(`/block can only be called on channels that <@${bot_id}> has joined`);
       return;
     } else {
-      // Get all users list w/ usernames
-      // const { members: allMembers } = await client.users.list();
-
       // Block command logic
       const { updateDoc, response } = setBlock(channelObj, channel_id, user_id, params, channelMembers);
 
@@ -95,7 +93,7 @@ const unblock = async ({ client, command, ack, respond }) => {
   }
 };
 
-const pair = async ({ client, command, ack, respond }) => {
+const active = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
     await ack();
@@ -124,7 +122,7 @@ const pair = async ({ client, command, ack, respond }) => {
   }
 };
 
-const unpair = async ({ client, command, ack, respond }) => {
+const inactive = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
     await ack();
@@ -153,11 +151,68 @@ const unpair = async ({ client, command, ack, respond }) => {
   }
 };
 
+const status = async ({ client, command, ack, respond }) => {
+  try {
+    // Acknowledge command request
+    await ack();
+
+    // Obtain user, channel_id, team_id and parameters
+    const { bot_id, membership, channelObj, userObj } = await commandHandler(client, command);
+
+    // If bot is not in channel, respond with failure, else use filtered members array to initiate function
+    if (!membership) {
+      await respond(`/ono status can only be called on channels that <@${bot_id}> has joined.`);
+      return;
+    } else {
+      const active = userObj.isActive ? 'Active' : 'Inactive';
+
+      let blockList = '';
+      const block = userObj.restrict;
+      block.forEach(element => {
+        blockList += `<@${element}> `;
+      });
+      if (blockList.length === 0) {
+        blockList = 'None';
+      }
+
+      let lastPair = '';
+      const lastPairing = new Date(userObj.lastPairing);
+      const installDate = channelObj.installDate;
+      if (installDate > lastPairing) {
+        lastPair = "You haven't participated in a pairing yet";
+      } else lastPair = userObj.lastPairing.toLocaleString('en-US');
+
+      let nextPair = 'You are inactive for pairings';
+      let nextChannelPair = channelObj.nextPairDate;
+      const nextUserPair = lastPairing[setTime](lastPairing[getTime]() + interval);
+
+      if (nextChannelPair > nextUserPair && userObj.isActive) {
+        nextPair = nextChannelPair.toLocaleString('en-US');
+      } else if (userObj.isActive) {
+        nextChannelPair = new Date(nextChannelPair);
+        nextChannelPair[setTime](nextChannelPair[getTime]() + interval);
+        nextPair = nextChannelPair.toLocaleString('en-US');
+      }
+
+      await respond(`Here are your current parameters for one-on-ones in this channel:\n
+      *Status:* ${active} for pairings in this channel\n
+      *Minimum Frequency:* Every ${userObj.frequency} days\n
+      *Last Pairing Date:* ${lastPair}\n
+      *Next Pairing Date:* ${nextPair}\n
+      *Block List:* ${blockList}
+      `);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 export default function registerCommands(app) {
-  app.command('/frequency', frequency);
-  app.command('/block', block);
-  app.command('/unblock', unblock);
-  app.command('/pair', pair);
-  app.command('/unpair', unpair);
+  app.command('/ono-frequency', frequency);
+  app.command('/ono-block', block);
+  app.command('/ono-unblock', unblock);
+  app.command('/ono-active', active);
+  app.command('/ono-inactive', inactive);
+  app.command('/ono-status', status);
 }
