@@ -22,9 +22,9 @@ const frequency = async ({ client, command, ack, respond }) => {
       if (typeof updateDoc === 'object') {
         const result = await updateInstallation(team_id, updateDoc);
         if (result.acknowledged && result.modifiedCount) {
-          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${params} days`);
-          await respond(`Your new frequency of one-on-one's in this channel is every ${params} days.`);
-        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${params} days`);
+          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
+          await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} days.`);
+        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
       } else await respond(updateDoc);
     }
   }
@@ -103,7 +103,7 @@ const active = async ({ client, command, ack, respond }) => {
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
-      await respond(`/pair can only be called on channels that <@${bot_id}> has joined.`);
+      await respond(`/ono-active can only be called on channels that <@${bot_id}> has joined.`);
       return;
     } else {
       const updateDoc = isActive(teamObj[channel_id], channel_id, user_id);
@@ -132,7 +132,7 @@ const inactive = async ({ client, command, ack, respond }) => {
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
-      await respond(`/unpair can only be called on channels that <@${bot_id}> has joined.`);
+      await respond(`/ono-inactive can only be called on channels that <@${bot_id}> has joined.`);
       return;
     } else {
       const updateDoc = isInactive(teamObj[channel_id], channel_id, user_id);
