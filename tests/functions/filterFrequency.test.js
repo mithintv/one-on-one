@@ -137,7 +137,7 @@ test('#3 filterFrequency w/ mixed dates', () => {
           id: 'U04DRTFB6QM',
           name: 'Prakash',
           frequency: "14",
-          lastPairing: new Date(Date.now()),
+          lastPairing: new Date(),
           isActive: true,
           restrict: []
         }
@@ -157,7 +157,7 @@ test('#3 filterFrequency w/ mixed dates', () => {
           id: 'U04ESESV56G',
           name: 'Cuarine',
           frequency: "14",
-          lastPairing: new Date(Date.now()),
+          lastPairing: new Date(),
           isActive: true,
           restrict: []
         }
