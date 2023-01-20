@@ -185,7 +185,7 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
 
   else {
     // Check if passed in members are members of the channel
-    const splitParams = params.replace(/[^a-zA-Z0-9]/g, "").split(" ");
+    const splitParams = params.replace(/[^a-zA-Z0-9 ]/g, "").split(" ");
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};
