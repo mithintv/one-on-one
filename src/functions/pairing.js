@@ -1,3 +1,5 @@
+import { setTime, getTime, interval } from "../lib/constants.js";
+
 // Shuffle/randmoize array logic
 export const shuffle = (array) => {
   let currentIndex = array.length, randomIndex;
@@ -33,8 +35,8 @@ export const filterFrequency = (activeMembers, membersArr) => {
   for (let i = 0; i < activeMembers.length; i++) {
     const index = membersArr.findIndex(member => Object.keys(member)[0] === activeMembers[i]);
     const lastPairDate = new Date(membersArr[index][activeMembers[i]].lastPairing.toISOString());
-    const nextPairDate = new Date(lastPairDate.setMinutes(lastPairDate.getMinutes() + parseInt(membersArr[index][activeMembers[i]].frequency)));
-    if (currentDate.getTime() > nextPairDate.getTime()) {
+    const nextPairDate = new Date(lastPairDate[setTime](lastPairDate[getTime]() + parseInt(membersArr[index][activeMembers[i]].frequency)));
+    if (currentDate[getTime]() > nextPairDate[getTime]()) {
       readyMembers.push(activeMembers[i]);
     };
   }

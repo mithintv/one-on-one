@@ -362,3 +362,106 @@ test('#6 /frequency w/ invalid params for inactive user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '91'))
     .toStrictEqual(`/frequency can only be called for active users. Set yourself active for pairing with the /pair command first.`);
 });
+
+test('#7 /frequency w/ duplicate params for active user', () => {
+  expect(setFrequency({
+    isActive: true,
+    installDate: new Date('2022-12-21T16:18:35.654Z'),
+    nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+    reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+    members: [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: '',
+          isActive: false,
+          restrict: []
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  }, 'C04DUMG5QCT', 'U04DRTFB6QM', '21 21'))
+    .toStrictEqual({
+      $set: {
+        C04DUMG5QCT: {
+          isActive: true,
+          installDate: new Date('2022-12-21T16:18:35.654Z'),
+          nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+          reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+          members: [
+            {
+              U04DE8L08R5: {
+                id: 'U04DE8L08R5',
+                name: 'Mithin',
+                frequency: "14",
+                lastPairing: '',
+                isActive: false,
+                restrict: []
+              }
+            },
+            {
+              U04DRTFB6QM: {
+                id: 'U04DRTFB6QM',
+                name: 'Prakash',
+                frequency: "21",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04EPTE4TU3: {
+                id: 'U04EPTE4TU3',
+                name: 'Nannu',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04ESESV56G: {
+                id: 'U04ESESV56G',
+                name: 'Cuarine',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+          ],
+        }
+      }
+    });
+});

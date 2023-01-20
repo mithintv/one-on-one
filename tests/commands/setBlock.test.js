@@ -986,3 +986,211 @@ test('#11 /block w/ invalid multi params for active user w/o restrictions', () =
     }, response: "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\nThe following members are not in this channel and were ignored for the /block command:\n<@U04EHD34KGW>\n<@U04EMKFLADB>\n"
   });
 });
+
+test('#12 /block w/ valid duplicate params for active user w/o restrictions', () => {
+  expect(setBlock({
+    isActive: true,
+    installDate: new Date('2022-12-21T16:18:35.654Z'),
+    nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+    reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+    members: [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Prakash @Prakash', channelMembers)).toStrictEqual({
+    updateDoc: {
+      $set: {
+        C04DUMG5QCT: {
+          isActive: true,
+          installDate: new Date('2022-12-21T16:18:35.654Z'),
+          nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+          reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+          members: [
+            {
+              U04DE8L08R5: {
+                id: 'U04DE8L08R5',
+                name: 'Mithin',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: ['U04DRTFB6QM']
+              }
+            },
+            {
+              U04DRTFB6QM: {
+                id: 'U04DRTFB6QM',
+                name: 'Prakash',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04EPTE4TU3: {
+                id: 'U04EPTE4TU3',
+                name: 'Nannu',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04ESESV56G: {
+                id: 'U04ESESV56G',
+                name: 'Cuarine',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+          ],
+        }
+      }
+    }, response: "You are currently not being paired with the following members in this channel for one-on-one's:\n<@U04DRTFB6QM>\n"
+  });
+});
+
+test('#13 /block w/ invalid duplicate params for active user w/o restrictions', () => {
+  expect(setBlock({
+    isActive: true,
+    installDate: new Date('2022-12-21T16:18:35.654Z'),
+    nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+    reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+    members: [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Offereop @Offereop', channelMembers)).toStrictEqual({
+    updateDoc: {
+      $set: {
+        C04DUMG5QCT: {
+          isActive: true,
+          installDate: new Date('2022-12-21T16:18:35.654Z'),
+          nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+          reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+          members: [
+            {
+              U04DE8L08R5: {
+                id: 'U04DE8L08R5',
+                name: 'Mithin',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04DRTFB6QM: {
+                id: 'U04DRTFB6QM',
+                name: 'Prakash',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04EPTE4TU3: {
+                id: 'U04EPTE4TU3',
+                name: 'Nannu',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04ESESV56G: {
+                id: 'U04ESESV56G',
+                name: 'Cuarine',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+          ],
+        }
+      }
+    }, response: "You are currently being paired with everyone on this channel for one-on-one's with no restrictions.\nThe following members are not in this channel and were ignored for the /block command:\n<@Offereop>\n"
+  });
+});

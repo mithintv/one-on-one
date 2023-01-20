@@ -34,7 +34,7 @@ const joined = async ({ client, event }) => {
       const { members: allMembers } = await client.users.list();
 
       // Delete messages sent by bot in dev mode
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.ENVIRO === 'testing') {
         const { messages } = await client.conversations.history({
           channel: channel_id
         });
