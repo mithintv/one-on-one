@@ -36,7 +36,7 @@ export const setFrequency = (channelObj, channel_id, user_id, params) => {
   }
   // If a parameter is passed and is a valid number from 1 to 90, set it as new frequency
   else if (params && parseInt(params) !== NaN && parseInt(params) >= 1 && parseInt(params) <= 90) {
-    channelObj.members[index][user_id].frequency = params;
+    channelObj.members[index][user_id].frequency = parseInt(params).toString();
     // Create a document that sets the frequency of specific user
     return {
       $set: {
@@ -76,7 +76,15 @@ export const setBlock = (channelObj, channel_id, user_id, params, channelMembers
   // If parameters are set, begin block logic
   else {
     // Create array from passed in usernames
-    const splitParams = params.replace(/@/g, "").split(" ");
+    const splitParams = params.replace(/[^a-zA-Z0-9 ]/g, "").split(" ");
+    // Handle duplicate params
+    const duplicates = {};
+    for (let i = 0; i < splitParams.length; i++) {
+      duplicates[splitParams[i]] ? duplicates[splitParams[i]] += 1 : duplicates[splitParams[i]] = 1;
+      if (duplicates[splitParams[i]] === 2) {
+        splitParams.splice(i, 1);
+      }
+    }
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};
@@ -186,6 +194,13 @@ export const setUnblock = (channelObj, channel_id, user_id, params, channelMembe
   else {
     // Check if passed in members are members of the channel
     const splitParams = params.replace(/[^a-zA-Z0-9 ]/g, "").split(" ");
+    const duplicates = {};
+    for (let i = 0; i < splitParams.length; i++) {
+      duplicates[splitParams[i]] ? duplicates[splitParams[i]] += 1 : duplicates[splitParams[i]] = 1;
+      if (duplicates[splitParams[i]] === 2) {
+        splitParams.splice(i, 1);
+      }
+    }
 
     // Create object with keys corresponding to names and values corresponding to user_ids
     const memberNames = {};

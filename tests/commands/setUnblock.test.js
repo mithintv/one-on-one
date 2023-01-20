@@ -411,7 +411,7 @@ test('#7 /unblock w/ params for active user w/ no restrictions', () => {
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04DRTFB6QM', channelMembers)).toStrictEqual({
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Prakash', channelMembers)).toStrictEqual({
     updateDoc: null, response: "You are already being paired with everyone on this channel for one-on-one's with no restrictions."
   });
 });
@@ -465,7 +465,7 @@ test('#8 /unblock w/ params for active user w/ restrictions', () => {
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04DRTFB6QM', channelMembers)).toStrictEqual({
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Prakash', channelMembers)).toStrictEqual({
     updateDoc: {
       $set: {
         C04DUMG5QCT: {
@@ -570,7 +570,7 @@ test('#9 /unblock w/ invalid params for active user w/o restrictions', () => {
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04EHD34KGW', channelMembers)).toStrictEqual({
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Offereop', channelMembers)).toStrictEqual({
     updateDoc: null, response: "You are already being paired with everyone on this channel for one-on-one's with no restrictions."
   });
 });
@@ -624,8 +624,8 @@ test('#10 /unblock w/ invalid params for active user w/ restrictions', () => {
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04EHD34KGW', channelMembers)).toStrictEqual({
-    updateDoc: null, response: "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock.\nThe following members are not in this channel and were ignored for the /unblock command:\n<@U04EHD34KGW>\n"
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Offereop', channelMembers)).toStrictEqual({
+    updateDoc: null, response: "The /unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock.\nThe following members are not in this channel and were ignored for the /unblock command:\n<@Offereop>\n"
   });
 });
 
@@ -678,7 +678,7 @@ test('#11 /unblock w/ mixed params for active user w/ restrictions', () => {
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04EHD34KGW U04DRTFB6QM', channelMembers)).toStrictEqual({
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Offereop @Prakash', channelMembers)).toStrictEqual({
     updateDoc: {
       $set: {
         C04DUMG5QCT: {
@@ -730,7 +730,7 @@ test('#11 /unblock w/ mixed params for active user w/ restrictions', () => {
           ],
         }
       }
-    }, response: "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n<@U04DRTFB6QM>\nYou have removed all restrictions and are currently being paired with everyone on this channel for one-on-ones.\nThe following members are not in this channel and were ignored for the /unblock command:\n<@U04EHD34KGW>\n"
+    }, response: "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n<@U04DRTFB6QM>\nYou have removed all restrictions and are currently being paired with everyone on this channel for one-on-ones.\nThe following members are not in this channel and were ignored for the /unblock command:\n<@Offereop>\n"
   });
 });
 
@@ -783,7 +783,7 @@ test('#12 /unblock w/ mixed params for active user w/ multiple restrictions', ()
         }
       },
     ],
-  }, 'C04DUMG5QCT', 'U04DE8L08R5', 'U04EHD34KGW, U04DRTFB6QM', channelMembers)).toStrictEqual({
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Offereop, @Prakash', channelMembers)).toStrictEqual({
     updateDoc: {
       $set: {
         C04DUMG5QCT: {
@@ -835,6 +835,110 @@ test('#12 /unblock w/ mixed params for active user w/ multiple restrictions', ()
           ],
         }
       }
-    }, response: "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n<@U04DRTFB6QM>\nYou are currently not being paired with the following members in this channel:\n<@U04EPTE4TU3>\nThe following members are not in this channel and were ignored for the /unblock command:\n<@U04EHD34KGW>\n"
+    }, response: "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n<@U04DRTFB6QM>\nYou are currently not being paired with the following members in this channel:\n<@U04EPTE4TU3>\nThe following members are not in this channel and were ignored for the /unblock command:\n<@Offereop>\n"
+  });
+});
+
+test('#13 /unblock w/ duplicate params for active user w/ multiple restrictions', () => {
+  expect(setUnblock({
+    isActive: true,
+    installDate: new Date('2022-12-21T16:18:35.654Z'),
+    nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+    reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+    members: [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: ['U04DRTFB6QM', 'U04EPTE4TU3']
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: '',
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  }, 'C04DUMG5QCT', 'U04DE8L08R5', '@Prakash @Prakash', channelMembers)).toStrictEqual({
+    updateDoc: {
+      $set: {
+        C04DUMG5QCT: {
+          isActive: true,
+          installDate: new Date('2022-12-21T16:18:35.654Z'),
+          nextPairDate: new Date('2022-12-28T16:19:17.282Z'),
+          reinstallDate: new Date('2022-12-21T16:19:17.282Z'),
+          members: [
+            {
+              U04DE8L08R5: {
+                id: 'U04DE8L08R5',
+                name: 'Mithin',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: ['U04EPTE4TU3']
+              }
+            },
+            {
+              U04DRTFB6QM: {
+                id: 'U04DRTFB6QM',
+                name: 'Prakash',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04EPTE4TU3: {
+                id: 'U04EPTE4TU3',
+                name: 'Nannu',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+            {
+              U04ESESV56G: {
+                id: 'U04ESESV56G',
+                name: 'Cuarine',
+                frequency: "14",
+                lastPairing: '',
+                isActive: true,
+                restrict: []
+              }
+            },
+          ],
+        }
+      }
+    }, response: "You have succesfully removed the following members from your one-on-one restrictions list for this channel:\n<@U04DRTFB6QM>\nYou are currently not being paired with the following members in this channel:\n<@U04EPTE4TU3>\n"
   });
 });

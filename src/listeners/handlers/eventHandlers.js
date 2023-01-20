@@ -28,7 +28,7 @@ export const installDate = () => {
   const nextPairDate = new Date();
   const firstPairDate = new Date();
   nextPairDate[setTime](nextPairDate[getTime]() + interval);
-  firstPairDate[setTime](nextPairDate[getTime]() + 7);
+  firstPairDate[setTime](firstPairDate[getTime]() + 7);
 
   return { currentDate, nextPairDate, firstPairDate };
 };
