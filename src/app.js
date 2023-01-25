@@ -1,7 +1,7 @@
-import app from "./src/lib/slackConfig";
-import mongo from "./src/lib/mongo";
+import app from "./lib/slackConfig.js";
+import mongo from "./lib/mongo.js";
 // slack listeners
-import registerListeners from "./src/listeners/index";
+import registerListeners from "./listeners/index.js";
 
 await mongo.connect();
 console.log('Successfully connected to database');
@@ -11,5 +11,5 @@ registerListeners(app);
 
 (async () => {
   await app.start(process.env.PORT || 3080);
-  console.log('Express app is running');
+  console.log('Bolt app is running');
 })();

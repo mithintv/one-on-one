@@ -1,7 +1,8 @@
 import "dotenv/config";
 
-import { App, ExpressReceiver, LogLevel } from "@slack/bolt";
-import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo";
+import pkg from '@slack/bolt';
+const { ExpressReceiver, App, LogLevel } = pkg;
+import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
 
 export const receiver = new ExpressReceiver({
   clientId: process.env.SLACK_CLIENT_ID,

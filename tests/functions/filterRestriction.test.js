@@ -1,95 +1,113 @@
 import { filterRestriction } from "../../src/functions/pairing";
 
-test('filterRestriction w/ no restrictions', async () => {
-  await expect(filterRestriction([
+test('#1 filterRestriction w/ no restrictions', () => {
+  expect(filterRestriction([
     'U04DE8L08R5',
     'U04DRTFB6QM',
     'U04EPTE4TU3',
-    'U04ESESV56G',
-    'U04FDNKH2L8',
-    'U04DE8L08R5'
-  ], {
-    U04DE8L08R5: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04DRTFB6QM: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:35:31.584Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04EPTE4TU3: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04ESESV56G: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:35:31.584Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04FDNKH2L8: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: [],
-      isActive: true
-    }
-  }))
-    .resolves.toStrictEqual(
+    'U04ESESV56G'
+  ],
+    [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  ))
+    .toStrictEqual(
       [
         'U04DE8L08R5',
         'U04DRTFB6QM',
         'U04EPTE4TU3',
-        'U04ESESV56G',
-        'U04FDNKH2L8',
-        'U04DE8L08R5'
+        'U04ESESV56G'
       ]);
 });
 
-test('filterRestriction w/ restrictions', async () => {
-  await expect(filterRestriction([
+test('#2 filterRestriction w/ restrictions', () => {
+  expect(filterRestriction([
     'U04DE8L08R5',
     'U04DRTFB6QM',
     'U04EPTE4TU3',
     'U04ESESV56G',
-    'U04FDNKH2L8',
-    'U04DE8L08R5'
-  ], {
-    U04DE8L08R5: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: ['U04DRTFB6QM'],
-      isActive: true
-    },
-    U04DRTFB6QM: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:35:31.584Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04EPTE4TU3: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04ESESV56G: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:35:31.584Z'),
-      restrict: [],
-      isActive: true
-    },
-    U04FDNKH2L8: {
-      frequency: '14',
-      lastPairing: new Date('2022-12-22T20:33:28.273Z'),
-      restrict: [],
-      isActive: true
-    }
-  }))
-    .resolves.toHaveLength(6);
+  ],
+    [
+      {
+        U04DE8L08R5: {
+          id: 'U04DE8L08R5',
+          name: 'Mithin',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: ['U04DRTFB6QM']
+        }
+      },
+      {
+        U04DRTFB6QM: {
+          id: 'U04DRTFB6QM',
+          name: 'Prakash',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04EPTE4TU3: {
+          id: 'U04EPTE4TU3',
+          name: 'Nannu',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+      {
+        U04ESESV56G: {
+          id: 'U04ESESV56G',
+          name: 'Cuarine',
+          frequency: "14",
+          lastPairing: new Date('2022-12-22T20:33:28.273Z'),
+          isActive: true,
+          restrict: []
+        }
+      },
+    ],
+  ))
+    .toHaveLength(4);
 });
