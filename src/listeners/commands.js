@@ -175,6 +175,7 @@ const status = async ({ client, command, ack, respond }) => {
         blockList = 'None';
       }
 
+      // acquire user to use timezone data for pairing dates
       const { user } = await client.users.info({
         user: user_id
       });
