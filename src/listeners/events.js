@@ -213,6 +213,8 @@ const reminder = async ({ client, event }) => {
           console.log(`Successfully completed pairing request for ${teamObj.team.id} in ${channel_id}`);
         } else throw new Error(`Error completing pairing request for ${teamObj.team.id} in ${channel_id}`);
 
+
+
         // Update members' last pairing date
         for (let i = 0; i < filteredMembers.length; i++) {
           if (channelObj.members[filteredMembers[i]]) {
