@@ -63,6 +63,8 @@ export const receiver = new ExpressReceiver({
   },
 });
 
+receiver.router.use("/.netlify/functions/app", receiver.router);
+
 const app = new App({
   receiver,
   ignoreSelf: false,
