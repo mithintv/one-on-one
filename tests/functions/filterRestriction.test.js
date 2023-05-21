@@ -1,5 +1,6 @@
 import { filterRestriction } from "../../src/functions/pairing";
 
+
 test('#1 filterRestriction w/ no restrictions', () => {
   expect(filterRestriction([
     'U04DE8L08R5',
@@ -58,6 +59,7 @@ test('#1 filterRestriction w/ no restrictions', () => {
         'U04ESESV56G'
       ]);
 });
+
 
 test('#2 filterRestriction w/ restrictions', () => {
   expect(filterRestriction([

@@ -1,7 +1,11 @@
+import util from "util";
+util.inspect.defaultOptions.depth = null;
+util.inspect.defaultOptions.colors = true;
+
 import { fetchInstallation } from "../../lib/mongo.js";
 import { shuffle, filterActive, filterFrequency, filterRestriction, stringifyPairings } from "../../functions/pairing.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
-import { setTime, getTime, interval } from "../../lib/constants.js";
+import { setTime, getTime, interval, first } from "../../lib/constants.js";
 
 export default async function eventHandler(client, event) {
   // Get team_id and channel_id from event
@@ -28,7 +32,7 @@ export const installDate = () => {
   const nextPairDate = new Date();
   const firstPairDate = new Date();
   nextPairDate[setTime](nextPairDate[getTime]() + interval);
-  firstPairDate[setTime](firstPairDate[getTime]() + 7);
+  firstPairDate[setTime](firstPairDate[getTime]() + first);
 
   return { currentDate, nextPairDate, firstPairDate };
 };
@@ -46,7 +50,7 @@ export const newChannel = (channelMembers, allMembers, channel_id) => {
       [curr]: {
         id: curr,
         name: member.name,
-        frequency: '14',
+        frequency: (interval / 2).toString(),
         lastPairing: lastPairing,
         restrict: [],
         isActive: true,
@@ -92,7 +96,7 @@ export const oldChannel = (channelMembers, allMembers, channel_id, channelObj) =
         [member.id]: {
           id: member.id,
           name: member.name,
-          frequency: '14',
+          frequency: (interval / 2).toString(),
           lastPairing: new Date(date.setDate(date.getDate() - 28)),
           isActive: true,
           restrict: []
@@ -211,13 +215,13 @@ export const createPairings = async (channelMembers, membersArr) => {
   return { filteredMembers, pairings, currentDate };
 };
 
+
 export const updateLastPairingDate = (filteredMembers, channelObj, currentDate) => {
-  for (let i = 0; i < filteredMembers.length; i++) {
-    const currentMember = Object.keys(channelObj.members[i])[0];
-    console.log(currentMember);
-    if (filteredMembers[i] === currentMember) {
-      channelObj.members[i][currentMember].lastPairing = currentDate;
-    }
+  const filteredSet = new Set(filteredMembers);
+
+  for (const member of filteredSet) {
+    const currentMember = channelObj.members.find(element => Object.keys(element)[0] === member);
+    currentMember[member].lastPairing = currentDate;
   }
   return channelObj;
 };

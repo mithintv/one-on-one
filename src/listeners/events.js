@@ -11,6 +11,7 @@ const mention = async ({ client, event }) => {
   }
 };
 
+
 const uninstall = async ({ body }) => {
   try {
     const { query, result } = await deleteInstallation(body.team_id);
@@ -22,6 +23,7 @@ const uninstall = async ({ body }) => {
     console.error(error);
   }
 };
+
 
 const joined = async ({ client, event }) => {
   try {
@@ -127,6 +129,7 @@ const joined = async ({ client, event }) => {
   }
 };
 
+
 const left = async ({ client, event }) => {
   try {
     // Get event details, bot id, and members
@@ -188,6 +191,7 @@ const left = async ({ client, event }) => {
   }
 };
 
+
 const reminder = async ({ client, event }) => {
   try {
     // Get event details
@@ -218,7 +222,7 @@ const reminder = async ({ client, event }) => {
 
         // Create next pairing date and create update doc
         const nextPairDate = new Date();
-        channelObj.nextPairDate = new Date(nextPairDate[setTime](nextPairDate[getTime]() + parseInt(interval)));
+        newChannelObj.nextPairDate = new Date(nextPairDate[setTime](nextPairDate[getTime]() + parseInt(interval)));
         const updateDoc = {
           $set: {
             [channel_id]: {
@@ -232,17 +236,18 @@ const reminder = async ({ client, event }) => {
         if (result.acknowledged && result.modifiedCount) {
           console.log(`Successfully updated DB for next pairing date for ${teamObj.team.id} in ${channel_id}`);
         } else throw new Error(`Error in updating DB for next pairing for ${teamObj.team.id} in ${channel_id}`);
-      }
 
-      // Schedule next pairing
-      const scheduleResponse = await client.chat.scheduleMessage({
-        channel: channel_id,
-        post_at: Math.ceil(nextPairDate.getTime() / 1000),
-        text: `Generating your one-on-one pairings~`
-      });
-      if (scheduleResponse.ok) {
-        console.log(`Successfully scheduled message for next pairing date for ${teamObj.team.id} in ${channel_id}`);
-      } else throw new Error(`Error in scheduling message for next pairing for ${teamObj.team.id} in ${channel_id}`);
+
+        // Schedule next pairing
+        const scheduleResponse = await client.chat.scheduleMessage({
+          channel: channel_id,
+          post_at: Math.ceil(nextPairDate.getTime() / 1000),
+          text: `Generating your one-on-one pairings~`
+        });
+        if (scheduleResponse.ok) {
+          console.log(`Successfully scheduled message for next pairing date for ${teamObj.team.id} in ${channel_id}`);
+        } else throw new Error(`Error in scheduling message for next pairing for ${teamObj.team.id} in ${channel_id}`);
+      }
     }
   } catch (error) {
     console.error(error);

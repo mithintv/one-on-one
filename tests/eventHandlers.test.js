@@ -1,10 +1,12 @@
 import { installDate, oldChannel, newChannel, memberJoins, memberLeaves, leaveChannel, updateLastPairingDate } from "../src/listeners/handlers/eventHandlers";
 
 import { allMembers } from "./testVariables";
+import { interval, first } from "../src/lib/constants";
 
 const { currentDate, nextPairDate, firstPairDate } = installDate();
 const { currentDate: memberPairDate } = installDate();
 memberPairDate.setDate(memberPairDate.getDate() - 28);
+
 
 test('Bot joins new channel', () => {
   expect(newChannel([
@@ -23,7 +25,7 @@ test('Bot joins new channel', () => {
               U04DE8L08R5: {
                 id: 'U04DE8L08R5',
                 name: 'Mithin',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -33,7 +35,7 @@ test('Bot joins new channel', () => {
               U04DRTFB6QM: {
                 id: 'U04DRTFB6QM',
                 name: 'Prakash',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -43,7 +45,7 @@ test('Bot joins new channel', () => {
               U04EHD34KGW: {
                 id: 'U04EHD34KGW',
                 name: 'Offereop',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -53,7 +55,7 @@ test('Bot joins new channel', () => {
               U04EMKFLADB: {
                 id: 'U04EMKFLADB',
                 name: 'Bob',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -63,7 +65,7 @@ test('Bot joins new channel', () => {
               U04EPTE4TU3: {
                 id: 'U04EPTE4TU3',
                 name: 'Nannu',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -73,7 +75,7 @@ test('Bot joins new channel', () => {
               U04ESESV56G: {
                 id: 'U04ESESV56G',
                 name: 'Cuarine',
-                frequency: "14",
+                frequency: (interval / 2).toString(),
                 lastPairing: memberPairDate,
                 isActive: true,
                 restrict: []
@@ -87,6 +89,7 @@ test('Bot joins new channel', () => {
       },
     });
 });
+
 
 test('Bot joins previously joined channel', () => {
   expect(oldChannel([
@@ -234,6 +237,7 @@ test('Bot joins previously joined channel', () => {
   });
 });
 
+
 test('Bot leaves channel', () => {
   expect(leaveChannel("C04DX8MV1EY",
     {
@@ -378,6 +382,7 @@ test('Bot leaves channel', () => {
   });
 });
 
+
 test('Member joins channel that bot has joined', () => {
   expect(memberJoins("U04ESESV56G", allMembers, "C04DX8MV1EY",
     {
@@ -509,6 +514,7 @@ test('Member joins channel that bot has joined', () => {
     }
   });
 });
+
 
 test('Member leaves channel that bot has joined', () => {
   expect(memberLeaves(
@@ -651,145 +657,132 @@ test('Member leaves channel that bot has joined', () => {
   });
 });
 
+
 test('Last pairings date logic', () => {
   expect(updateLastPairingDate(
-    ['U04DE8L08R5', 'U04DRTFB6QM', 'U04EHD34KGW', 'U04EMKFLADB', 'U04EPTE4TU3', 'U04ESESV56G',
+    [
+      'U04EMKFLADB',
+      'U04ESESV56G',
+      'U04DE8L08R5',
+      'U04EHD34KGW',
+      'U04FDNKH2L8',
+      'U04EMKFLADB'
     ],
     {
+      isActive: true,
+      installDate: new Date('2023-05-21T18:55:31.391Z'),
+      nextPairDate: new Date('2023-05-21T18:56:31.391Z'),
       members: [
         {
           U04DE8L08R5: {
             id: 'U04DE8L08R5',
-            name: 'Mithin',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
-          }
-        },
-        {
-          U04DRTFB6QM: {
-            id: 'U04DRTFB6QM',
-            name: 'Prakash',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
+            name: 'mithingthomas',
+            frequency: '1',
+            lastPairing: new Date('2023-04-23T18:55:31.391Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04EHD34KGW: {
             id: 'U04EHD34KGW',
-            name: 'Offereop',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
+            name: 'mithin.thomas',
+            frequency: '1',
+            lastPairing: new Date('2023-04-23T18:55:31.391Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04EMKFLADB: {
             id: 'U04EMKFLADB',
-            name: 'Bob',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
-          }
-        },
-        {
-          U04EPTE4TU3: {
-            id: 'U04EPTE4TU3',
-            name: 'Nannu',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
+            name: 'bobhanks69',
+            frequency: '1',
+            lastPairing: new Date('2023-04-23T18:55:31.391Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04ESESV56G: {
             id: 'U04ESESV56G',
-            name: 'Cuarine',
-            frequency: "14",
-            lastPairing: "2022-12-27T22:42:08.300Z",
-            isActive: true,
-            restrict: []
+            name: 'contact',
+            frequency: '1',
+            lastPairing: new Date('2023-04-23T18:55:31.391Z'),
+            restrict: [],
+            isActive: true
           }
         },
-      ],
-      isActive: true,
-      installDate: new Date('2023-01-24T22:42:08.301Z'),
-      nextPairDate: new Date('2023-01-31T22:42:08.301Z')
+        {
+          U04FDNKH2L8: {
+            id: 'U04FDNKH2L8',
+            name: 'mithingeorge1993',
+            frequency: '1',
+            lastPairing: new Date('2023-04-23T18:55:31.391Z'),
+            restrict: [],
+            isActive: true
+          }
+        }
+      ]
     },
-    currentDate
+    new Date('2023-05-21T19:02:34.635Z')
   )).toStrictEqual(
     {
+      isActive: true,
+      installDate: new Date('2023-05-21T18:55:31.391Z'),
+      nextPairDate: new Date('2023-05-21T18:56:31.391Z'),
       members: [
         {
           U04DE8L08R5: {
             id: 'U04DE8L08R5',
-            name: 'Mithin',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
-          }
-        },
-        {
-          U04DRTFB6QM: {
-            id: 'U04DRTFB6QM',
-            name: 'Prakash',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
+            name: 'mithingthomas',
+            frequency: '1',
+            lastPairing: new Date('2023-05-21T19:02:34.635Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04EHD34KGW: {
             id: 'U04EHD34KGW',
-            name: 'Offereop',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
+            name: 'mithin.thomas',
+            frequency: '1',
+            lastPairing: new Date('2023-05-21T19:02:34.635Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04EMKFLADB: {
             id: 'U04EMKFLADB',
-            name: 'Bob',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
-          }
-        },
-        {
-          U04EPTE4TU3: {
-            id: 'U04EPTE4TU3',
-            name: 'Nannu',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
+            name: 'bobhanks69',
+            frequency: '1',
+            lastPairing: new Date('2023-05-21T19:02:34.635Z'),
+            restrict: [],
+            isActive: true
           }
         },
         {
           U04ESESV56G: {
             id: 'U04ESESV56G',
-            name: 'Cuarine',
-            frequency: "14",
-            lastPairing: new Date(currentDate),
-            isActive: true,
-            restrict: []
+            name: 'contact',
+            frequency: '1',
+            lastPairing: new Date('2023-05-21T19:02:34.635Z'),
+            restrict: [],
+            isActive: true
           }
         },
-      ],
-      isActive: true,
-      installDate: new Date('2023-01-24T22:42:08.301Z'),
-      nextPairDate: new Date('2023-01-31T22:42:08.301Z')
-    }
+        {
+          U04FDNKH2L8: {
+            id: 'U04FDNKH2L8',
+            name: 'mithingeorge1993',
+            frequency: '1',
+            lastPairing: new Date('2023-05-21T19:02:34.635Z'),
+            restrict: [],
+            isActive: true
+          }
+        }
+      ]
+    },
   );
 });
