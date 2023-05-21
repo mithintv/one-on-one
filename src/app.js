@@ -9,7 +9,10 @@ console.log('Successfully connected to database');
 // registers commands for bot
 registerListeners(app);
 
+// set port
+let port = process.env.PORT || 3080;
+
 (async () => {
-  await app.start(process.env.PORT || 3080);
-  console.log('Bolt app is running');
+  await app.start(port);
+  console.log(`Bolt app is running on port ${port}`);
 })();

@@ -1,5 +1,6 @@
 import { setFrequency } from "../../src/listeners/handlers/commandHandlers";
 
+
 test('#1 /frequency w/o params for inactive user', () => {
   expect(setFrequency({
     isActive: true,
@@ -52,6 +53,7 @@ test('#1 /frequency w/o params for inactive user', () => {
     .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
 
+
 test('#2 /frequency w/o params for active user', () => {
   expect(setFrequency({
     isActive: true,
@@ -103,6 +105,7 @@ test('#2 /frequency w/o params for active user', () => {
   }, 'C04DUMG5QCT', 'U04DRTFB6QM', ''))
     .toStrictEqual(`Your current frequency of one-on-ones in this channel is every 14 days.`);
 });
+
 
 test('#3 /frequency w/ params for active user', () => {
   expect(setFrequency({
@@ -207,6 +210,7 @@ test('#3 /frequency w/ params for active user', () => {
     });
 });
 
+
 test('#4 /frequency w/ params for inactive user', () => {
   expect(setFrequency({
     isActive: true,
@@ -258,6 +262,7 @@ test('#4 /frequency w/ params for inactive user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '21'))
     .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
+
 
 test('#5 /frequency w/ invalid params for active user', () => {
   expect(setFrequency({
@@ -311,6 +316,7 @@ test('#5 /frequency w/ invalid params for active user', () => {
     .toStrictEqual(`You inputted an invalid value for frequency of one-on-ones. Only numeric values from 14 to 90 are accepted. Your current frequency of one-on-one's in this channel is every 14 days.`);
 });
 
+
 test('#6 /frequency w/ invalid params for inactive user', () => {
   expect(setFrequency({
     isActive: true,
@@ -362,6 +368,7 @@ test('#6 /frequency w/ invalid params for inactive user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '91'))
     .toStrictEqual(`/ono-frequency can only be called for active users. Set yourself active for pairing with the /ono-active command first.`);
 });
+
 
 test('#7 /frequency w/ duplicate params for active user', () => {
   expect(setFrequency({

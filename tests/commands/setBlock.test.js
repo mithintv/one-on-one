@@ -1,6 +1,7 @@
 import { setBlock } from "../../src/listeners/handlers/commandHandlers";
 import { channelMembers } from "../testVariables";
 
+
 test('#1 /block w/o params for active user', () => {
   expect(setBlock({
     isActive: true,
@@ -51,6 +52,7 @@ test('#1 /block w/o params for active user', () => {
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "You are currently being paired with everyone on this channel for one-on-ones with no restrictions." });
 });
+
 
 test('#2 /block w/o params for inactive user', () => {
   expect(setBlock({
@@ -104,6 +106,7 @@ test('#2 /block w/o params for inactive user', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: '/ono-block can only be called for active users. Set yourself active for pairing with the /ono-active command first.' });
 });
 
+
 test('#3 /block w/o params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -154,6 +157,7 @@ test('#3 /block w/o params for active user w/ restrictions', () => {
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "You are currently not being paired with the following members in this channel for one-on-ones:\n<@U04EPTE4TU3>\n" });
 });
+
 
 test('#4 /block w/ single params for active user w/ restrictions', () => {
   expect(setBlock({
@@ -259,6 +263,7 @@ test('#4 /block w/ single params for active user w/ restrictions', () => {
   });
 });
 
+
 test('#5 /block w/ single params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -362,6 +367,7 @@ test('#5 /block w/ single params for active user w/o restrictions', () => {
     }, response: "You are currently not being paired with the following members in this channel for one-on-ones:\n<@U04DRTFB6QM>\n"
   });
 });
+
 
 test('#6 /block w/ multi params for active user w/ restrictions', () => {
   expect(setBlock({
@@ -467,6 +473,7 @@ test('#6 /block w/ multi params for active user w/ restrictions', () => {
   });
 });
 
+
 test('#7 /block w/ multi params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -571,6 +578,7 @@ test('#7 /block w/ multi params for active user w/o restrictions', () => {
   });
 });
 
+
 test('#8 /block w/ invalid single params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -623,6 +631,7 @@ test('#8 /block w/ invalid single params for active user w/ restrictions', () =>
     updateDoc: null, response: "The /ono-block command must be called with a user in the channel or a list of users in the channel you wish to block.\nThe following members are not in this channel and were ignored for the command:\n<@U04EHD34KGW>\n"
   });
 });
+
 
 test('#9 /block w/ invalid single params for active user w/o restrictions', () => {
   expect(setBlock({
@@ -677,6 +686,7 @@ test('#9 /block w/ invalid single params for active user w/o restrictions', () =
   });
 });
 
+
 test('#10 /block w/ invalid multi params for active user w/ restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -730,6 +740,7 @@ test('#10 /block w/ invalid multi params for active user w/ restrictions', () =>
   });
 });
 
+
 test('#11 /block w/ invalid multi params for active user w/o restrictions', () => {
   expect(setBlock({
     isActive: true,
@@ -782,6 +793,7 @@ test('#11 /block w/ invalid multi params for active user w/o restrictions', () =
     updateDoc: null, response: "You are currently being paired with everyone on this channel for one-on-ones with no restrictions.\nThe following members are not in this channel and were ignored for the command:\n<@U04EHD34KGW>\n<@U04EMKFLADB>\n"
   });
 });
+
 
 test('#12 /block w/ valid duplicate params for active user w/o restrictions', () => {
   expect(setBlock({
@@ -886,6 +898,7 @@ test('#12 /block w/ valid duplicate params for active user w/o restrictions', ()
     }, response: "You are currently not being paired with the following members in this channel for one-on-ones:\n<@U04DRTFB6QM>\n"
   });
 });
+
 
 test('#13 /block w/ invalid duplicate params for active user w/o restrictions', () => {
   expect(setBlock({

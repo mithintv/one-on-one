@@ -1,6 +1,7 @@
 import { fetchInstallation } from "../../lib/mongo.js";
 import { checkBotMembership } from "../../functions/slackApi.js";
 
+
 export default async function commandHandler(client, command) {
   // Get team_id and channel_id from command
   const { team_id, channel_id, user_id, text: params } = command;

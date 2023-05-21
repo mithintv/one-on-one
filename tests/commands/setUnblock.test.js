@@ -1,6 +1,7 @@
 import { setUnblock } from "../../src/listeners/handlers/commandHandlers";
 import { channelMembers } from "../testVariables";
 
+
 test('#1 /unblock w/o params for active user w/ no restrictions', () => {
   expect(setUnblock({
     isActive: true,
@@ -51,6 +52,7 @@ test('#1 /unblock w/o params for active user w/ no restrictions', () => {
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently being paired with everyone on this channel for one-on-ones with no restrictions." });
 });
+
 
 test('#2 /unblock w/o params for inactive user w/ no restrictions', () => {
   expect(setUnblock({
@@ -103,6 +105,7 @@ test('#2 /unblock w/o params for inactive user w/ no restrictions', () => {
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "/ono-unblock can only be called for active users. Set yourself active for pairing with the /ono-active command first." });
 });
 
+
 test('#3 /unblock w/o params for active user w/ restrictions', () => {
   expect(setUnblock({
     isActive: true,
@@ -153,6 +156,7 @@ test('#3 /unblock w/o params for active user w/ restrictions', () => {
     ],
   }, 'C04DUMG5QCT', 'U04DE8L08R5', '', channelMembers)).toStrictEqual({ updateDoc: null, response: "The /ono-unblock command must be called with a user in the channel or a list of users in the channel you wish to unblock. You are currently not being paired with the following members in this channel for one-on-ones:\n<@U04DRTFB6QM>\n" });
 });
+
 
 test('#4 /unblock w/o params for inactive user w/ restrictions', () => {
   expect(setUnblock({
@@ -838,6 +842,7 @@ test('#12 /unblock w/ mixed params for active user w/ multiple restrictions', ()
     }, response: "You have succesfully removed the following members from your one-on-one block list for this channel:\n<@U04DRTFB6QM>\nYou are currently not being paired with the following members in this channel:\n<@U04EPTE4TU3>\nThe following members are not in this channel and were ignored for the command:\n<@Offereop>\n"
   });
 });
+
 
 test('#13 /unblock w/ duplicate params for active user w/ multiple restrictions', () => {
   expect(setUnblock({

@@ -2,6 +2,7 @@ import { updateInstallation } from "../lib/mongo.js";
 import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
 import { setTime, getTime, interval } from "../lib/constants.js";
 
+
 const frequency = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
@@ -33,6 +34,7 @@ const frequency = async ({ client, command, ack, respond }) => {
   }
 };
 
+
 const block = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
@@ -61,6 +63,7 @@ const block = async ({ client, command, ack, respond }) => {
     console.error(error);
   }
 };
+
 
 const unblock = async ({ client, command, ack, respond }) => {
   try {
@@ -93,6 +96,7 @@ const unblock = async ({ client, command, ack, respond }) => {
   }
 };
 
+
 const active = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
@@ -122,6 +126,7 @@ const active = async ({ client, command, ack, respond }) => {
   }
 };
 
+
 const inactive = async ({ client, command, ack, respond }) => {
   try {
     // Acknowledge command request
@@ -150,6 +155,7 @@ const inactive = async ({ client, command, ack, respond }) => {
     console.error(error);
   }
 };
+
 
 const status = async ({ client, command, ack, respond }) => {
   try {
