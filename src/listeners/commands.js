@@ -198,7 +198,7 @@ const status = async ({ client, command, ack, respond }) => {
       const nextUserPair = lastPairing[setTime](lastPairing[getTime]() + interval);
 
       if (nextChannelPair > nextUserPair && userObj.isActive) {
-        nextPair = nextChannelPair.toLocaleString('en-US');
+        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       } else if (userObj.isActive) {
         nextChannelPair = new Date(nextChannelPair);
         nextChannelPair[setTime](nextChannelPair[getTime]() + interval);
