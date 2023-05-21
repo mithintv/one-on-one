@@ -210,3 +210,14 @@ export const createPairings = async (channelMembers, membersArr) => {
 
   return { filteredMembers, pairings, currentDate };
 };
+
+export const updateLastPairingDate = (filteredMembers, channelObj, currentDate) => {
+  for (let i = 0; i < filteredMembers.length; i++) {
+    const currentMember = Object.keys(channelObj.members[i])[0];
+    console.log(currentMember);
+    if (filteredMembers[i] === currentMember) {
+      channelObj.members[i][currentMember].lastPairing = currentDate;
+    }
+  }
+  return channelObj;
+};

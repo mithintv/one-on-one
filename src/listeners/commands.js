@@ -157,7 +157,7 @@ const status = async ({ client, command, ack, respond }) => {
     await ack();
 
     // Obtain user, channel_id, team_id and parameters
-    const { bot_id, membership, channelObj, userObj } = await commandHandler(client, command);
+    const { user_id, bot_id, membership, channelObj, userObj } = await commandHandler(client, command);
 
     // If bot is not in channel, respond with failure, else use filtered members array to initiate function
     if (!membership) {
@@ -175,12 +175,17 @@ const status = async ({ client, command, ack, respond }) => {
         blockList = 'None';
       }
 
+      // acquire user to use timezone data for pairing dates
+      const { user } = await client.users.info({
+        user: user_id
+      });
+
       let lastPair = '';
       const lastPairing = new Date(userObj.lastPairing);
       const installDate = channelObj.installDate;
       if (installDate > lastPairing) {
         lastPair = "You haven't participated in a pairing yet";
-      } else lastPair = userObj.lastPairing.toLocaleString('en-US');
+      } else lastPair = userObj.lastPairing.toLocaleString('en-US', { timeZone: user.tz });
 
       let nextPair = 'You are inactive for pairings';
       let nextChannelPair = channelObj.nextPairDate;
@@ -191,7 +196,7 @@ const status = async ({ client, command, ack, respond }) => {
       } else if (userObj.isActive) {
         nextChannelPair = new Date(nextChannelPair);
         nextChannelPair[setTime](nextChannelPair[getTime]() + interval);
-        nextPair = nextChannelPair.toLocaleString('en-US');
+        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       }
 
       await respond(`Here are your current parameters for one-on-ones in this channel:\n

@@ -1,5 +1,5 @@
 import { deleteInstallation, updateInstallation } from "../lib/mongo.js";
-import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings } from "./handlers/eventHandlers.js";
+import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings, updateLastPairingDate } from "./handlers/eventHandlers.js";
 import { setTime, getTime, interval } from "../lib/constants.js";
 
 const mention = async ({ client, event }) => {
@@ -191,7 +191,7 @@ const left = async ({ client, event }) => {
 const reminder = async ({ client, event }) => {
   try {
     // Get event details
-    const { channelObj, channel_id, channelMembers, teamObj, team_id, userObj, user_id, bot_id, membership, membersObj } = await eventHandler(client, event);
+    const { channelObj, channel_id, channelMembers, teamObj, team_id, user_id, bot_id, membership, membersObj } = await eventHandler(client, event);
 
     if (membership && bot_id === user_id && event.text === 'Generating your one-on-one pairings~') {
       console.log(`Received pairing request from ${teamObj.team.id}`);
@@ -214,29 +214,25 @@ const reminder = async ({ client, event }) => {
         } else throw new Error(`Error completing pairing request for ${teamObj.team.id} in ${channel_id}`);
 
         // Update members' last pairing date
-        for (let i = 0; i < filteredMembers.length; i++) {
-          if (channelObj.members[filteredMembers[i]]) {
-            channelObj.members[filteredMembers[i]].lastPairing = currentDate;
+        const newChannelObj = updateLastPairingDate(filteredMembers, channelObj, currentDate);
+
+        // Create next pairing date and create update doc
+        const nextPairDate = new Date();
+        channelObj.nextPairDate = new Date(nextPairDate[setTime](nextPairDate[getTime]() + parseInt(interval)));
+        const updateDoc = {
+          $set: {
+            [channel_id]: {
+              ...newChannelObj
+            }
           }
-        }
+        };
+
+        // Save to DB
+        const result = await updateInstallation(team_id, updateDoc);
+        if (result.acknowledged && result.modifiedCount) {
+          console.log(`Successfully updated DB for next pairing date for ${teamObj.team.id} in ${channel_id}`);
+        } else throw new Error(`Error in updating DB for next pairing for ${teamObj.team.id} in ${channel_id}`);
       }
-
-      // Create next pairing date and create update doc
-      const nextPairDate = new Date();
-      channelObj.nextPairDate = new Date(nextPairDate[setTime](nextPairDate[getTime]() + parseInt(interval)));
-      const updateDoc = {
-        $set: {
-          [channel_id]: {
-            ...channelObj
-          }
-        }
-      };
-
-      // Save to DB
-      const result = await updateInstallation(team_id, updateDoc);
-      if (result.acknowledged && result.modifiedCount) {
-        console.log(`Successfully updated DB for next pairing date for ${teamObj.team.id} in ${channel_id}`);
-      } else throw new Error(`Error in updating DB for next pairing for ${teamObj.team.id} in ${channel_id}`);
 
       // Schedule next pairing
       const scheduleResponse = await client.chat.scheduleMessage({
