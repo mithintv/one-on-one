@@ -1,3 +1,4 @@
+import serverless from 'serverless-http';
 import app from "./lib/slackConfig.js";
 import mongo from "./lib/mongo.js";
 // slack listeners
@@ -12,7 +13,9 @@ registerListeners(app);
 // set port
 let port = process.env.PORT || 3080;
 
-(async () => {
-  await app.start(port);
-  console.log(`Bolt app is running on port ${port}`);
-})();
+// (async () => {
+//   await app.start(port);
+//   console.log(`Bolt app is running on port ${port}`);
+// })();
+
+export const handler = serverless(app);
