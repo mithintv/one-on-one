@@ -1,6 +1,6 @@
 import { deleteInstallation, updateInstallation } from "../lib/mongo.js";
 import eventHandler, { memberLeaves, newChannel, memberJoins, oldChannel, leaveChannel, createPairings, updateLastPairingDate } from "./handlers/eventHandlers.js";
-import { setTime, getTime, interval } from "../lib/constants.js";
+import { setTime, getTime, interval, first, span } from "../lib/constants.js";
 
 const mention = async ({ client, event }) => {
   try {
@@ -92,12 +92,12 @@ const joined = async ({ client, event }) => {
       // Send welcome message to slack
       await client.chat.postMessage({
         channel: channel_id,
-        text: 'Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in 7 days and further parings will be posted monthly.',
+        text: `Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in ${first} ${span} and further parings will be posted monthly.`,
       });
 
       // Schedule pairing
       let pairDate = new Date();
-      pairDate = new Date(pairDate[setTime](pairDate[getTime]() + 7));
+      pairDate = new Date(pairDate[setTime](pairDate[getTime]() + first));
       const scheduleResponse = await client.chat.scheduleMessage({
         channel: channel_id,
         post_at: Math.ceil(pairDate.getTime() / 1000),

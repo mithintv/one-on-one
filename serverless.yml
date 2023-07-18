@@ -1,0 +1,30 @@
+service: serverless-bolt-js
+frameworkVersion: "3"
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+custom:
+  dotenv:
+    path: .env
+provider:
+  name: aws
+  runtime: nodejs16.x
+  environment:
+    SLACK_CLIENT_ID: ${.env:SLACK_CLIENT_ID}
+    SLACK_STATE: ${.env:SLACK_SLATE}
+    SLACK_CLIENT_SECRET: ${.env:SLACK_CLIENT_SECRET}
+    SLACK_SIGNING_SECRET: ${.env:SLACK_SIGNING_SECRET}
+    SLACK_APP_TOKEN: ${.env:SLACK_APP_TOKEN}
+    ENVIRO: ${.env:ENVIRO}
+    INTERVAL: ${.env:INTERVAL}
+    DATABASE: ${.env:DATABASE}
+    USERNAME: ${.env:USERNAME}
+    PASSWORD: ${.env:PASSWORD}
+    CLUSTER: ${.env:CLUSTER}
+functions:
+  slack:
+    handler: app.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
