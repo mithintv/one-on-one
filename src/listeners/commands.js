@@ -194,22 +194,25 @@ const status = async ({ client, command, ack, respond }) => {
       } else lastPair = userObj.lastPairing.toLocaleString('en-US', { timeZone: user.tz });
 
       let nextPair = 'You are inactive for pairings';
-      let nextChannelPair = channelObj.nextPairDate;
-      const nextUserPair = lastPairing[setTime](lastPairing[getTime]() + interval);
+      const nextUserPair = new Date(lastPairing[setTime](lastPairing[getTime]() + parseInt(userObj.frequency)));
 
-      if (nextChannelPair > nextUserPair && userObj.isActive) {
-        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
-      } else if (userObj.isActive) {
-        let nextChannelPairCopy = new Date(nextChannelPair);
-        nextChannelPair[setTime](nextChannelPairCopy[getTime]() + interval);
-        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
+
+      if (channelObj.nextPairDate > nextUserPair && userObj.isActive) {
+        nextPair = channelObj.nextPairDate.toLocaleString('en-US', { timeZone: user.tz });
+      } else if (channelObj.nextPairDate < nextUserPair && userObj.isActive) {
+        let nextUserChannelPair = new Date(channelObj.nextPairDate);
+        while (nextUserChannelPair < nextUserPair) {
+          nextUserChannelPair = new Date(nextUserChannelPair[setTime](nextUserChannelPair[getTime]() + parseInt(interval)));
+        }
+        nextPair = nextUserChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       }
 
       await respond(`Here are your current parameters for one-on-ones in this channel:\n
       *Status:* ${active} for pairings in this channel\n
       *Minimum Frequency:* Every ${userObj.frequency} ${span}\n
       *Last Pairing Date:* ${lastPair}\n
-      *Next Pairing Date:* ${nextPair}\n
+      *Next Eligible Pairing Date:* ${nextPair}\n
+      *Next Scheduled Pairing Date:* ${channelObj.nextPairDate.toLocaleString('en-US', { timeZone: user.tz })}\n
       *Block List:* ${blockList}
       `);
     }
