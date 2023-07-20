@@ -3,7 +3,7 @@ let setTime, getTime, interval, first, span;
 if (process.env.ENVIRO === 'testing') {
   setTime = 'setMinutes';
   getTime = 'getMinutes';
-  interval = 2;
+  interval = process.env.INTERVAL;
   first = 1;
   span = "minutes";
 } else {

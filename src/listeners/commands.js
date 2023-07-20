@@ -1,6 +1,6 @@
 import { updateInstallation } from "../lib/mongo.js";
 import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
-import { setTime, getTime, interval } from "../lib/constants.js";
+import { setTime, getTime, interval, span } from "../lib/constants.js";
 
 
 const frequency = async ({ client, command, ack, respond }) => {
@@ -25,7 +25,7 @@ const frequency = async ({ client, command, ack, respond }) => {
         if (result.acknowledged && result.modifiedCount) {
           console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
           await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} days.`);
-        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
+        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} ${span}`);
       } else await respond(updateDoc);
     }
   }
@@ -200,14 +200,14 @@ const status = async ({ client, command, ack, respond }) => {
       if (nextChannelPair > nextUserPair && userObj.isActive) {
         nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       } else if (userObj.isActive) {
-        nextChannelPair = new Date(nextChannelPair);
-        nextChannelPair[setTime](nextChannelPair[getTime]() + interval);
+        let nextChannelPairCopy = new Date(nextChannelPair);
+        nextChannelPair[setTime](nextChannelPairCopy[getTime]() + interval);
         nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       }
 
       await respond(`Here are your current parameters for one-on-ones in this channel:\n
       *Status:* ${active} for pairings in this channel\n
-      *Minimum Frequency:* Every ${userObj.frequency} days\n
+      *Minimum Frequency:* Every ${userObj.frequency} ${span}\n
       *Last Pairing Date:* ${lastPair}\n
       *Next Pairing Date:* ${nextPair}\n
       *Block List:* ${blockList}
