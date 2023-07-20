@@ -23,8 +23,8 @@ const frequency = async ({ client, command, ack, respond }) => {
       if (typeof updateDoc === 'object') {
         const result = await updateInstallation(team_id, updateDoc);
         if (result.acknowledged && result.modifiedCount) {
-          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
-          await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} days.`);
+          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} ${span}`);
+          await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} ${span}.`);
         } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} ${span}`);
       } else await respond(updateDoc);
     }

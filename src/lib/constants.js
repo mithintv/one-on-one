@@ -4,7 +4,7 @@ if (process.env.ENVIRO === 'testing') {
   setTime = 'setMinutes';
   getTime = 'getMinutes';
   interval = process.env.INTERVAL;
-  first = 1;
+  first = 2;
   span = "minutes";
 } else {
   setTime = 'setDate';
