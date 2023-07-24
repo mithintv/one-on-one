@@ -28,11 +28,14 @@ export default async function eventHandler(client, event) {
 
 
 export const installDate = (isReinstall = false) => {
-  if (isReinstall) interval = first;
   const currentDate = new Date();
   const nextPairDate = new Date();
   const firstPairDate = new Date();
-  nextPairDate[setTime](nextPairDate[getTime]() + interval);
+  if (isReinstall) {
+    nextPairDate[setTime](nextPairDate[getTime]() + first);
+  } else {
+    nextPairDate[setTime](nextPairDate[getTime]() + interval);
+  }
   firstPairDate[setTime](firstPairDate[getTime]() + first);
 
   return { currentDate, nextPairDate, firstPairDate };
