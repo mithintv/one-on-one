@@ -118,7 +118,8 @@ export const oldChannel = (channelMembers, allMembers, channel_id, channelObj) =
     }
   }
 
-  const { currentDate, nextPairDate } = installDate();
+  // Call installDate with isReinstall set to true;
+  const { currentDate, nextPairDate } = installDate(true);
   channelObj.reinstallDate = currentDate;
   channelObj.nextPairDate = nextPairDate;
 
