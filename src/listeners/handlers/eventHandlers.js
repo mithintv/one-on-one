@@ -27,11 +27,15 @@ export default async function eventHandler(client, event) {
 }
 
 
-export const installDate = () => {
+export const installDate = (isReinstall = false) => {
   const currentDate = new Date();
   const nextPairDate = new Date();
   const firstPairDate = new Date();
-  nextPairDate[setTime](nextPairDate[getTime]() + interval);
+  if (isReinstall) {
+    nextPairDate[setTime](nextPairDate[getTime]() + first);
+  } else {
+    nextPairDate[setTime](nextPairDate[getTime]() + interval);
+  }
   firstPairDate[setTime](firstPairDate[getTime]() + first);
 
   return { currentDate, nextPairDate, firstPairDate };
@@ -117,7 +121,8 @@ export const oldChannel = (channelMembers, allMembers, channel_id, channelObj) =
     }
   }
 
-  const { currentDate, nextPairDate } = installDate();
+  // Call installDate with isReinstall set to true;
+  const { currentDate, nextPairDate } = installDate(true);
   channelObj.reinstallDate = currentDate;
   channelObj.nextPairDate = nextPairDate;
 

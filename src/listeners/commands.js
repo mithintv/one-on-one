@@ -1,6 +1,6 @@
 import { updateInstallation } from "../lib/mongo.js";
 import commandHandler, { setFrequency, setBlock, isActive, isInactive, setUnblock } from "./handlers/commandHandlers.js";
-import { setTime, getTime, interval } from "../lib/constants.js";
+import { setTime, getTime, interval, span } from "../lib/constants.js";
 
 
 const frequency = async ({ client, command, ack, respond }) => {
@@ -23,9 +23,9 @@ const frequency = async ({ client, command, ack, respond }) => {
       if (typeof updateDoc === 'object') {
         const result = await updateInstallation(team_id, updateDoc);
         if (result.acknowledged && result.modifiedCount) {
-          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
-          await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} days.`);
-        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} days`);
+          console.log(`Successfully set frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} ${span}`);
+          await respond(`Your new frequency of one-on-ones in this channel is every ${parseInt(params)} ${span}.`);
+        } else throw new Error(`Error setting frequency of ${user_id} in ${channel_id} for ${team_id} to ${parseInt(params)} ${span}`);
       } else await respond(updateDoc);
     }
   }
@@ -194,22 +194,25 @@ const status = async ({ client, command, ack, respond }) => {
       } else lastPair = userObj.lastPairing.toLocaleString('en-US', { timeZone: user.tz });
 
       let nextPair = 'You are inactive for pairings';
-      let nextChannelPair = channelObj.nextPairDate;
-      const nextUserPair = lastPairing[setTime](lastPairing[getTime]() + interval);
+      const nextUserPair = new Date(lastPairing[setTime](lastPairing[getTime]() + parseInt(userObj.frequency)));
 
-      if (nextChannelPair > nextUserPair && userObj.isActive) {
-        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
-      } else if (userObj.isActive) {
-        nextChannelPair = new Date(nextChannelPair);
-        nextChannelPair[setTime](nextChannelPair[getTime]() + interval);
-        nextPair = nextChannelPair.toLocaleString('en-US', { timeZone: user.tz });
+
+      if (channelObj.nextPairDate > nextUserPair && userObj.isActive) {
+        nextPair = channelObj.nextPairDate.toLocaleString('en-US', { timeZone: user.tz });
+      } else if (channelObj.nextPairDate < nextUserPair && userObj.isActive) {
+        let nextUserChannelPair = new Date(channelObj.nextPairDate);
+        while (nextUserChannelPair < nextUserPair) {
+          nextUserChannelPair = new Date(nextUserChannelPair[setTime](nextUserChannelPair[getTime]() + parseInt(interval)));
+        }
+        nextPair = nextUserChannelPair.toLocaleString('en-US', { timeZone: user.tz });
       }
 
       await respond(`Here are your current parameters for one-on-ones in this channel:\n
       *Status:* ${active} for pairings in this channel\n
-      *Minimum Frequency:* Every ${userObj.frequency} days\n
+      *Minimum Frequency:* Every ${userObj.frequency} ${span}\n
       *Last Pairing Date:* ${lastPair}\n
-      *Next Pairing Date:* ${nextPair}\n
+      *Next Eligible Pairing Date:* ${nextPair}\n
+      *Next Scheduled Pairing Date:* ${channelObj.nextPairDate.toLocaleString('en-US', { timeZone: user.tz })}\n
       *Block List:* ${blockList}
       `);
     }

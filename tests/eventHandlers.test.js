@@ -230,7 +230,7 @@ test('Bot joins previously joined channel', () => {
           }],
         isActive: true,
         installDate: new Date('2022-12-20T15:44:39.390Z'),
-        nextPairDate: nextPairDate,
+        nextPairDate: installDate(true).nextPairDate,
         reinstallDate: currentDate,
       }
     },

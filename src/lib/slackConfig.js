@@ -1,10 +1,17 @@
 import "dotenv/config";
 
 import pkg from '@slack/bolt';
-const { ExpressReceiver, App, LogLevel } = pkg;
+const { ExpressReceiver, App, AwsLambdaReceiver, LogLevel } = pkg;
 import { deleteInstallation, fetchInstallation, saveInstallation } from "./mongo.js";
 
-export const receiver = new ExpressReceiver({
+// slack listeners
+import registerMiddleware from "../listeners/middleware.js";
+import registerCommands from "../listeners/commands.js";
+import registerEvents from "../listeners/events.js";
+
+
+export const expressReceiver = new ExpressReceiver({
+  processBeforeResponse: true,
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -64,10 +71,14 @@ export const receiver = new ExpressReceiver({
 });
 
 const app = new App({
-  receiver,
+  // token: process.env.SLACK_BOT_TOKEN,
+  receiver: expressReceiver,
   ignoreSelf: false,
   // logLevel: LogLevel.DEBUG
 });
 
+registerMiddleware(app);
+registerCommands(app);
+registerEvents(app);
 
 export default app;

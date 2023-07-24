@@ -2,13 +2,13 @@ const checkRetry = async ({ context, next }) => {
   try {
     if (context.retryNum) {
       console.log(`Middleware Running. Retry Attempt: ${context.retryNum}`);
-      return;
     }
+    await next();
   }
   catch (error) {
     console.error(error);
   }
-  await next();
+
 };
 
 export default function registerMiddleware(app) {
