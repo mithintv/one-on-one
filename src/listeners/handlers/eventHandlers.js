@@ -27,7 +27,8 @@ export default async function eventHandler(client, event) {
 }
 
 
-export const installDate = () => {
+export const installDate = (isReinstall = false) => {
+  if (isReinstall) interval = first;
   const currentDate = new Date();
   const nextPairDate = new Date();
   const firstPairDate = new Date();
