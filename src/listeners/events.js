@@ -92,7 +92,7 @@ const joined = async ({ client, event }) => {
       // Send welcome message to slack
       await client.chat.postMessage({
         channel: channel_id,
-        text: `Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in ${first} ${span} and further parings will be posted monthly.`,
+        text: `Thanks for adding One-on-One bot to the channel. The first one-on-one pairing will be posted in ${first} ${span} and further pairings will be posted every ${interval} ${span}.`,
       });
 
       // Schedule pairing
